@@ -1,4 +1,4 @@
- // src/components/admin/NewAdminPanel.tsx
+// src/components/admin/NewAdminPanel.tsx
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { 
@@ -53,26 +53,17 @@ export default function NewAdminPanel() {
     checkMobile();
     window.addEventListener('resize', checkMobile);
     
-    const token = localStorage.getItem("adminToken");
-    const userStr = localStorage.getItem("adminUser");
-
-    if (!token || !userStr) {
-      navigate("/admin-login");
-      return;
-    }
-
-    try {
-      setUser(JSON.parse(userStr));
-    } catch {
-      navigate("/admin-login");
-    }
+    // ✅ DIRECT ACCESS - NO LOGIN REQUIRED
+    setUser({
+      name: 'Admin User',
+      email: 'admin@example.com',
+      role: 'admin'
+    });
     
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
   const logout = () => {
-    localStorage.removeItem("adminToken");
-    localStorage.removeItem("adminUser");
     navigate("/");
   };
 
@@ -389,7 +380,7 @@ export default function NewAdminPanel() {
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/>
             </svg>
-            {sidebarOpen && "Logout"}
+            {sidebarOpen && "Back to Site"}
           </button>
         </div>
       </div>
@@ -515,6 +506,10 @@ export default function NewAdminPanel() {
     </div>
   );
 }
+
+// ==================== DATA TABLE COMPONENT ====================
+// (Keep all your existing DataTable, EmailReplyModal, Modal components exactly as they are - NO CHANGES NEEDED)
+// Baki ka code (DataTable, EmailReplyModal, Modal) bilkul waise hi rakho, kuch change mat karna
 
 // ==================== DATA TABLE COMPONENT WITH IMAGE UPLOAD & EMAIL REPLY ====================
 const DataTable = ({ table }: { table: string }) => {

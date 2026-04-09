@@ -1,6 +1,8 @@
 import { useEffect, useState, useRef } from 'react';
 import API from '../../services/api';
 import { SplineSceneBasic } from "../../demo";
+import ProcessBalls from '../../components/common/ProcessBalls';
+import { HeroScrollDemo } from '../../components/demo/HeroScrollDemo';
 
 import { 
   ChevronLeft, ChevronRight, Star, MapPin, Phone, 
@@ -643,6 +645,9 @@ const Home = () => {
         </div>
       </section>
 
+      {/* Hero Scroll Demo - Projects Showcase (Services ke baad) */}
+      <HeroScrollDemo />
+
       {/* Portfolio Section */}
       <section className="portfolio-section" style={{ padding: '80px 0', background: '#0A0A0A' }}>
         <div className="container" style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 20px' }}>
@@ -801,50 +806,25 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Process Section */}
-      <section className="process-section" style={{ padding: '80px 0' }}>
+      {/* Process Section - YAHAN BALLS SHOW HONGE BOXES KI JAGAH */}
+      <section className="process-section" style={{ padding: '80px 0', background: '#0A0A0A' }}>
         <div className="container" style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 20px' }}>
           <div className="section-header" style={{ textAlign: 'center', marginBottom: '50px' }}>
             <span className="section-subtitle" style={{ fontSize: '14px', color: '#FFD700' }}>How We Work</span>
             <h2 className="section-title" style={{ fontSize: '42px', margin: '10px 0' }}>Our <span style={{ color: '#FFD700' }}>Process</span></h2>
+            <p className="section-description" style={{ fontSize: '16px', color: '#aaa' }}>
+              A streamlined approach to deliver exceptional results
+            </p>
           </div>
           
-          <div className="process-grid" style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-            gap: '30px'
-          }}>
-            {processSteps.map((item: any) => (
-              <div key={item.id} className="process-card" style={{
-                background: '#1a1a1a',
-                borderRadius: '20px',
-                padding: '30px',
-                textAlign: 'center',
-                position: 'relative'
-              }}>
-                <div style={{
-                  position: 'absolute',
-                  top: '-15px',
-                  left: '20px',
-                  background: '#FFD700',
-                  color: '#000',
-                  width: '40px',
-                  height: '40px',
-                  borderRadius: '50%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: '20px',
-                  fontWeight: 'bold'
-                }}>{item.step_number}</div>
-                <div style={{ margin: '20px 0', color: '#FFD700' }}>
-                  {renderIcon(item.icon_name, 40)}
-                </div>
-                <h3 style={{ fontSize: '22px', marginBottom: '15px' }}>{item.title}</h3>
-                <p style={{ fontSize: '14px', lineHeight: '1.6', color: '#ccc' }}>{item.description}</p>
-              </div>
-            ))}
-          </div>
+          {/* 3D Process Balls Component - Boxes ki jagah balls */}
+          {processSteps.length > 0 ? (
+            <ProcessBalls steps={processSteps} />
+          ) : (
+            <div style={{ textAlign: 'center', color: '#FFD700', padding: '50px' }}>
+              Loading process steps...
+            </div>
+          )}
         </div>
       </section>
 
