@@ -3,7 +3,7 @@ import React, { useRef, useEffect, useState } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Sphere, Text } from '@react-three/drei';
 
-const ProcessBall = ({ startPos, mousePos, title, shouldMove }) => {
+const ProcessBall = ({ startPos, mousePos, title, shouldMove, ballColor, glowColor }) => {
   const groupRef = useRef();
   const pos = useRef({ x: startPos[0], y: startPos[1], z: startPos[2] });
   const originalPos = useRef({ x: startPos[0], y: startPos[1], z: startPos[2] });
@@ -48,49 +48,58 @@ const ProcessBall = ({ startPos, mousePos, title, shouldMove }) => {
     groupRef.current.position.set(pos.current.x, pos.current.y, startPos[2]);
   });
   
-  const size = 0.95;
+  const size = 1.15;
   
   const getFontSize = (text) => {
-    if (text.length <= 8) return 0.32;
-    if (text.length <= 10) return 0.28;
-    return 0.24;
+    if (text === "Discovery" || text === "Design") return 0.32;
+    if (text === "Development") return 0.28;
+    if (text === "Testing") return 0.32;
+    if (text === "Deployment") return 0.28;
+    if (text === "Maintenance") return 0.28;
+    return 0.30;
   };
   
   const fontSize = getFontSize(title);
   
   return (
     <group ref={groupRef} position={[startPos[0], startPos[1], startPos[2]]}>
+      {/* Main Ball with custom color */}
       <Sphere args={[size, 64, 64]}>
         <meshStandardMaterial 
-          color="#FFFFFF"
-          metalness={0.4}
-          roughness={0.15}
-          emissive="#FFFFFF"
-          emissiveIntensity={0.05}
+          color={ballColor}
+          metalness={0.5}
+          roughness={0.2}
+          emissive={glowColor}
+          emissiveIntensity={0.12}
         />
       </Sphere>
       
+      {/* Inner Glow */}
       <Sphere args={[size * 0.88, 64, 64]}>
         <meshStandardMaterial 
-          color="#EEEEEE"
-          metalness={0.2}
-          roughness={0.1}
-          emissive="#FFFFFF"
-          emissiveIntensity={0.1}
+          color={ballColor}
+          metalness={0.3}
+          roughness={0.15}
+          emissive={glowColor}
+          emissiveIntensity={0.18}
           transparent
-          opacity={0.7}
+          opacity={0.6}
         />
       </Sphere>
       
+      {/* TEXT */}
       <Text
-        position={[0, 0, size + 0.05]}
+        position={[0, 0, size + 0.08]}
         fontSize={fontSize}
-        color="#000000"
+        color="#FFFFFF"
         anchorX="center"
         anchorY="middle"
         fontWeight="bold"
-        maxWidth={2.8}
+        fontStyle="bold"
         textAlign="center"
+        renderOrder={1}
+        outlineWidth={0.02}
+        outlineColor="#000000"
       >
         {title}
       </Text>
@@ -104,23 +113,40 @@ export default function ProcessBalls({ steps }) {
   const [shouldMove, setShouldMove] = useState(false);
   const sectionRef = useRef(null);
   
+  // COLORS ACCORDING TO WEBSITE THEME
+  // Pair 1 (Development & Testing) - Cyan/Tech color
+  // Pair 2 (Deployment & Maintenance) - Purple/Premium color
+  // Discovery & Design - White (default)
+  const getBallColor = (title) => {
+    if (title === "Development" || title === "Testing") {
+      return { main: "#FFFFFF", glow: "#FFFFFF" };  // Cyan - Tech color
+    }
+    if (title === "Deployment" || title === "Maintenance") {
+      return { main: "#FFFFFF", glow: "#FFFFFF" };  // Purple - Premium color
+    }
+    // Discovery & Design - White
+    return { main: "#FFFFFF", glow: "#FFFFFF" };
+  };
+  
   useEffect(() => {
     if (!steps || steps.length === 0) return;
     
-    // PYRAMID SHAPE - ZYADA ZYADA GAP ke saath
-    // Har ball ke beech gap aur badhaya
+    // PYRAMID SHAPE
     const positions = [
-      [0, 3.8, 0],                          // Row 1 - top (pehle 3.2 tha)
-      [-2.2, 1.9, 0.1], [2.2, 1.9, -0.1],   // Row 2 - middle (pehle 1.8 tha)
-      [-3.5, 0, 0], [0, 0, 0.1], [3.5, 0, -0.1],  // Row 3 - bottom (pehle 2.8 tha)
+      [0, 4.2, 0],                          // Discovery
+      [-2.6, 2.2, 0.1], [2.6, 2.2, -0.1],   // Design, Development
+      [-4.2, 0, 0], [0, 0, 0.1], [4.2, 0, -0.1],  // Testing, Deployment, Maintenance
     ];
     
     const ballList = [];
     for (let i = 0; i < steps.length && i < positions.length; i++) {
+      const colors = getBallColor(steps[i].title);
       ballList.push({
         id: steps[i].id || i,
         pos: positions[i],
         title: steps[i].title || '',
+        ballColor: colors.main,
+        glowColor: colors.glow,
       });
     }
     setBalls(ballList);
@@ -196,22 +222,22 @@ export default function ProcessBalls({ steps }) {
     <div 
       ref={sectionRef}
       style={{ 
-        height: '650px', 
+        height: '750px', 
         position: 'relative', 
         overflow: 'hidden',
         borderRadius: '24px'
       }}
     >
       <Canvas 
-        camera={{ position: [0, 0, 12.5], fov: 45 }} 
+        camera={{ position: [0, 0, 14], fov: 45 }} 
         style={{ background: 'transparent', width: '100%', height: '100%' }}
       >
-        <ambientLight intensity={0.5} />
-        <pointLight position={[5, 5, 5]} intensity={0.7} color="#FFFFFF" />
-        <pointLight position={[-5, -3, 5]} intensity={0.5} color="#FFFFFF" />
-        <pointLight position={[0, 7, 5]} intensity={0.6} color="#FFFFFF" />
-        <pointLight position={[0, 0, 8]} intensity={0.4} color="#FFFFFF" />
-        <directionalLight position={[2, 3, 4]} intensity={0.5} color="#FFFFFF" />
+        <ambientLight intensity={0.6} />
+        <pointLight position={[5, 5, 5]} intensity={0.8} color="#FFFFFF" />
+        <pointLight position={[-5, -3, 5]} intensity={0.6} color="#FFFFFF" />
+        <pointLight position={[0, 7, 5]} intensity={0.7} color="#FFFFFF" />
+        <pointLight position={[0, 0, 8]} intensity={0.5} color="#FFFFFF" />
+        <directionalLight position={[2, 3, 4]} intensity={0.6} color="#FFFFFF" />
         
         {balls.map((ball) => (
           <ProcessBall 
@@ -220,6 +246,8 @@ export default function ProcessBalls({ steps }) {
             mousePos={mousePosition}
             title={ball.title}
             shouldMove={shouldMove}
+            ballColor={ball.ballColor}
+            glowColor={ball.glowColor}
           />
         ))}
       </Canvas>

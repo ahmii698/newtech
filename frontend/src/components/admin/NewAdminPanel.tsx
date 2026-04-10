@@ -527,7 +527,7 @@ const DataTable = ({ table }: { table: string }) => {
   const [uploadingImage, setUploadingImage] = useState(false);
   const rowsPerPage = 10;
 
-  const API_URL = 'http://localhost:8000/api';
+  const API_URL = 'http://localhost:8000/admin-api.php';
 
   // Image Upload Function
   const uploadImage = async (file: File): Promise<string | null> => {

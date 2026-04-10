@@ -80,7 +80,7 @@ const Home = () => {
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsPageLoading(false);
-    }, 1500);
+    }, 800);
     return () => clearTimeout(timer);
   }, []);
 
@@ -411,19 +411,41 @@ const Home = () => {
 
   if (isPageLoading || loading) {
     return (
-      <div className="loading-screen">
-        <div className="loader">
+      <div className="loading-screen" style={{ 
+        background: '#0A0A0A', 
+        position: 'fixed', 
+        top: 0, 
+        left: 0, 
+        right: 0, 
+        bottom: 0, 
+        zIndex: 9999,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
+      }}>
+        <div className="loader" style={{ textAlign: 'center' }}>
           <div className="loader-golden">
-            <div className="loader-inner"></div>
+            <div className="loader-inner" style={{
+              width: '60px',
+              height: '60px',
+              border: '3px solid rgba(255,215,0,0.3)',
+              borderTop: '3px solid #FFD700',
+              borderRadius: '50%',
+              animation: 'spin 1s linear infinite',
+              margin: '0 auto'
+            }}></div>
           </div>
-          <div className="loader-text">
-            <h2>TopTech Solutions</h2>
-            <p>Crafting Digital Excellence...</p>
-            <div className="loader-progress">
-              <div className="loader-progress-bar"></div>
-            </div>
+          <div className="loader-text" style={{ marginTop: '20px' }}>
+            <h2 style={{ color: '#FFD700' }}>TopTech Solutions</h2>
+            <p style={{ color: '#aaa' }}>Crafting Digital Excellence...</p>
           </div>
         </div>
+        <style>{`
+          @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+          }
+        `}</style>
       </div>
     );
   }
@@ -455,17 +477,43 @@ const Home = () => {
         <Calendar size={26} color="#000000" />
       </button>
 
-      {/* Hero Section - Text LEFT, Robot RIGHT (70% height) */}
+      {/* Hero Section */}
       <section style={{
         position: 'relative',
         width: '100%',
         height: '100vh',
         minHeight: '100vh',
         overflow: 'hidden',
-        background: '#000000',
+        background: '#0A0A0A',
         display: 'flex',
         alignItems: 'center'
       }}>
+        
+        {/* Yellow Glow Effect */}
+        <div style={{
+          position: 'absolute',
+          top: '20%',
+          right: '10%',
+          width: '500px',
+          height: '500px',
+          borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(255,215,0,0.08), transparent 70%)',
+          pointerEvents: 'none',
+          zIndex: 0
+        }} />
+        
+        <div style={{
+          position: 'absolute',
+          bottom: '10%',
+          left: '5%',
+          width: '400px',
+          height: '400px',
+          borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(255,215,0,0.05), transparent 70%)',
+          pointerEvents: 'none',
+          zIndex: 0
+        }} />
+
         {/* Text Content - LEFT SIDE */}
         <div style={{
           flex: 1,
@@ -520,13 +568,15 @@ const Home = () => {
           </div>
         </div>
 
-        {/* Robot 3D Model - RIGHT SIDE (70% height of section) */}
+        {/* Robot 3D Model */}
         <div style={{
           flex: 1,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          height: '70%'
+          height: '70%',
+          position: 'relative',
+          zIndex: 1
         }}>
           <div style={{
             width: '100%',
@@ -537,7 +587,7 @@ const Home = () => {
           </div>
         </div>
         
-        {/* Stats Section - Light transparent bottom bar */}
+        {/* Stats Section - Removed black background */}
         <div style={{
           position: 'absolute',
           bottom: 0,
@@ -548,7 +598,7 @@ const Home = () => {
           gap: 'clamp(20px, 6vw, 70px)',
           flexWrap: 'wrap',
           padding: 'clamp(10px, 3vw, 20px)',
-          background: 'rgba(0,0,0,0.4)',
+          background: 'transparent',
           backdropFilter: 'blur(8px)',
           zIndex: 2,
           borderTop: '1px solid rgba(255,215,0,0.3)'
@@ -645,7 +695,7 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Hero Scroll Demo - Projects Showcase (Services ke baad) */}
+      {/* Hero Scroll Demo */}
       <HeroScrollDemo />
 
       {/* Portfolio Section */}
@@ -776,7 +826,7 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Statistics Section */}
+      {/* Statistics Section - Counter removed */}
       <section className="stats-section" style={{ background: '#0A0A0A', padding: '80px 0', overflow: 'hidden' }}>
         <div className="container" style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 20px' }}>
           <div className="section-header" style={{ textAlign: 'center', marginBottom: '50px' }}>
@@ -789,15 +839,16 @@ const Home = () => {
               {[...statistics, ...statistics].map((stat: any, index: number) => (
                 <div key={`${stat.id}-${index}`} style={{ flex: '0 0 auto', padding: '0 15px' }}>
                   <div style={{
-                    background: '#1a1a1a',
+                    background: 'transparent',
                     borderRadius: '20px',
                     padding: '30px',
                     textAlign: 'center',
-                    minWidth: '200px'
+                    minWidth: '200px',
+                    border: '1px solid rgba(255,215,0,0.2)'
                   }}>
                     <div style={{ marginBottom: '15px' }}>{renderStatIcon(index)}</div>
                     <h2 style={{ fontSize: '42px', margin: '10px 0', color: '#FFD700' }}>{stat.value}{stat.suffix}</h2>
-                    <p style={{ fontSize: '14px' }}>{stat.label}</p>
+                    <p style={{ fontSize: '14px', color: '#aaa' }}>{stat.label}</p>
                   </div>
                 </div>
               ))}
@@ -806,7 +857,7 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Process Section - YAHAN BALLS SHOW HONGE BOXES KI JAGAH */}
+      {/* Process Section */}
       <section className="process-section" style={{ padding: '80px 0', background: '#0A0A0A' }}>
         <div className="container" style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 20px' }}>
           <div className="section-header" style={{ textAlign: 'center', marginBottom: '50px' }}>
@@ -817,7 +868,6 @@ const Home = () => {
             </p>
           </div>
           
-          {/* 3D Process Balls Component - Boxes ki jagah balls */}
           {processSteps.length > 0 ? (
             <ProcessBalls steps={processSteps} />
           ) : (
@@ -884,7 +934,7 @@ const Home = () => {
         </div>
       </section>
       
-      {/* Pricing Section */}
+      {/* Pricing Section - Black color removed */}
       <section className="pricing-section" style={{ padding: '80px 0' }}>
         <div className="container" style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 20px' }}>
           <div className="section-header" style={{ textAlign: 'center', marginBottom: '50px' }}>

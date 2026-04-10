@@ -9,6 +9,20 @@ use App\Http\Controllers\Controller;
 
 class AdminController extends Controller
 {
+    // Add this constructor to handle CORS
+    public function __construct()
+    {
+        header('Access-Control-Allow-Origin: http://localhost:5174');
+        header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
+        header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With');
+        header('Access-Control-Allow-Credentials: true');
+        
+        // Handle preflight
+        if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+            http_response_code(200);
+            exit();
+        }
+    }
 
     public function index($table)
     {
@@ -103,46 +117,40 @@ class AdminController extends Controller
         }
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | 🔥 SEND EMAIL FUNCTION (IMPORTANT)
-    |--------------------------------------------------------------------------
-    */
+    public function sendEmail(Request $request)
+    {
+        try {
 
-   public function sendEmail(Request $request)
-{
-    try {
+            $name = $request->name ?? 'User';
+            $email = $request->email ?? null;
+            $messageText = $request->message ?? 'No Message';
 
-        $name = $request->name ?? 'User';
-        $email = $request->email ?? null;
-        $messageText = $request->message ?? 'No Message';
+            if (!$email) {
+                return response()->json([
+                    'success' => false,
+                    'error' => 'Email is required'
+                ], 400);
+            }
 
-        if (!$email) {
+            Mail::raw(
+                "Hello $name,\n\nThank you for contacting us!\n\nWe received your message:\n$messageText\n\nOur team will contact you soon.\n\n- TopTech Team",
+                function ($message) use ($email) {
+                    $message->to($email)
+                            ->subject('Thank You for Contacting Us');
+                }
+            );
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Email sent to user successfully'
+            ]);
+
+        } catch (\Exception $e) {
+
             return response()->json([
                 'success' => false,
-                'error' => 'Email is required'
-            ], 400);
+                'error' => $e->getMessage()
+            ], 500);
         }
-
-        Mail::raw(
-            "Hello $name,\n\nThank you for contacting us!\n\nWe received your message:\n$messageText\n\nOur team will contact you soon.\n\n- TopTech Team",
-            function ($message) use ($email) {
-                $message->to($email) // ✅ USER EMAIL
-                        ->subject('Thank You for Contacting Us');
-            }
-        );
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Email sent to user successfully'
-        ]);
-
-    } catch (\Exception $e) {
-
-        return response()->json([
-            'success' => false,
-            'error' => $e->getMessage()
-        ], 500);
     }
-}
 }
