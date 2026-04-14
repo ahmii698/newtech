@@ -10,22 +10,22 @@ class Testimonial extends Model
     
     protected $fillable = [
         'client_name',
-        'client_role',
-        'client_company',
-        'client_image',
         'testimonial_text',
         'rating',
         'order_number',
-        'is_active'
+        'is_active',
+        'is_approved'  // ✅ ADD THIS
     ];
     
     protected $casts = [
         'rating' => 'integer',
-        'is_active' => 'boolean'
+        'is_active' => 'boolean',
+        'is_approved' => 'boolean'  // ✅ ADD THIS
     ];
     
     protected $attributes = [
         'is_active' => true,
+        'is_approved' => false,  // ✅ ADD THIS (default pending)
         'order_number' => 0,
         'rating' => 5
     ];
@@ -34,6 +34,18 @@ class Testimonial extends Model
     public function scopeActive($query)
     {
         return $query->where('is_active', true);
+    }
+    
+    // ✅ ADD THIS - Sirf approved testimonials (website par dikhane ke liye)
+    public function scopeApproved($query)
+    {
+        return $query->where('is_approved', true);
+    }
+    
+    // ✅ ADD THIS - Sirf pending testimonials (admin review ke liye)
+    public function scopePending($query)
+    {
+        return $query->where('is_approved', false);
     }
     
     // Order by order_number
@@ -52,14 +64,5 @@ class Testimonial extends Model
     public function scopeHighRated($query)
     {
         return $query->where('rating', '>=', 4);
-    }
-    
-    // Get client full name with company
-    public function getClientFullNameAttribute()
-    {
-        if ($this->client_company) {
-            return $this->client_name . ', ' . $this->client_company;
-        }
-        return $this->client_name;
     }
 }

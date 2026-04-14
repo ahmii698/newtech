@@ -12,11 +12,13 @@ class TeamMember extends Model
         'name',
         'role',
         'expertise',
+        'experience',      // ✅ ADD THIS
+        'about',           // ✅ ADD THIS
         'image',
         'social_linkedin',
         'social_twitter',
         'social_github',
-        'social_behance',
+        'social_instagram', // ✅ CHANGE: social_behance -> social_instagram
         'order_number',
         'is_active'
     ];
@@ -42,14 +44,14 @@ class TeamMember extends Model
         return $query->orderBy('order_number', 'asc');
     }
     
-    // Get social media links as array (agar JSON store kar rahe ho to)
+    // Get social media links as array
     public function getSocialLinksAttribute()
     {
         return [
             'linkedin' => $this->social_linkedin,
             'twitter' => $this->social_twitter,
             'github' => $this->social_github,
-            'behance' => $this->social_behance
+            'instagram' => $this->social_instagram  // ✅ CHANGE: behance -> instagram
         ];
     }
 }

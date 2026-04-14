@@ -12,31 +12,17 @@ class ProcessStep extends Model
         'step_number',
         'title',
         'description',
-        'icon_name',
         'order_number',
         'is_active'
     ];
     
-    protected $attributes = [
-        'is_active' => true,
-        'order_number' => 0
-    ];
-    
-    // Sirf active steps
     public function scopeActive($query)
     {
-        return $query->where('is_active', true);
+        return $query->where('is_active', 1);
     }
     
-    // Order by order_number
     public function scopeOrdered($query)
     {
         return $query->orderBy('order_number', 'asc');
-    }
-    
-    // Step number ke hisaab se order (01, 02, 03)
-    public function scopeStepOrdered($query)
-    {
-        return $query->orderBy('step_number', 'asc');
     }
 }

@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import API from '../../services/api';
+// import {API_URL} from '../../../config';
 import { SplineSceneBasic } from "../../demo";
 import ProcessBalls from '../../components/common/ProcessBalls';
 import { HeroScrollDemo } from '../../components/demo/HeroScrollDemo';
@@ -53,6 +54,15 @@ const Home = () => {
   const [newsletterEmail, setNewsletterEmail] = useState('');
   const [newsletterStatus, setNewsletterStatus] = useState('');
   const [newsletterErrorMsg, setNewsletterErrorMsg] = useState('');
+  
+  // Testimonial Modal States
+  const [showTestimonialModal, setShowTestimonialModal] = useState(false);
+  const [testimonialFormData, setTestimonialFormData] = useState({
+    name: '',
+    testimonial: '',
+    rating: 5
+  });
+  const [testimonialFormStatus, setTestimonialFormStatus] = useState('');
   
   const [services, setServices] = useState([]);
   const [team, setTeam] = useState([]);
@@ -365,6 +375,41 @@ const Home = () => {
     }
   };
 
+  // Testimonial Submit Handler
+  const handleTestimonialSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setTestimonialFormStatus('sending');
+    
+    if (!testimonialFormData.name || !testimonialFormData.testimonial) {
+      alert('Please fill all required fields');
+      setTestimonialFormStatus('');
+      return;
+    }
+    
+    try {
+      const response = await API.post('/testimonials', {
+        client_name: testimonialFormData.name,
+        testimonial_text: testimonialFormData.testimonial,
+        rating: testimonialFormData.rating
+      });
+      
+      if (response.data.success) {
+        setTestimonialFormStatus('success');
+        alert('✅ Thank you! Your testimonial will be reviewed and published soon.');
+        setTestimonialFormData({ name: '', testimonial: '', rating: 5 });
+        setShowTestimonialModal(false);
+      } else {
+        throw new Error(response.data.message);
+      }
+    } catch (error: any) {
+      console.error('Error:', error);
+      setTestimonialFormStatus('error');
+      alert('❌ Error: ' + (error.response?.data?.message || 'Failed to submit'));
+    } finally {
+      setTimeout(() => setTestimonialFormStatus(''), 2000);
+    }
+  };
+
   const filteredPortfolio = activeFilter === 'all' 
     ? portfolio 
     : portfolio.filter(item => item.category === activeFilter);
@@ -409,9 +454,10 @@ const Home = () => {
     return statIcons[index % statIcons.length];
   };
 
+  // ========== ANIMATED LOADING SCREEN ==========
   if (isPageLoading || loading) {
     return (
-      <div className="loading-screen" style={{ 
+      <div style={{ 
         background: '#0A0A0A', 
         position: 'fixed', 
         top: 0, 
@@ -423,27 +469,95 @@ const Home = () => {
         alignItems: 'center',
         justifyContent: 'center'
       }}>
-        <div className="loader" style={{ textAlign: 'center' }}>
-          <div className="loader-golden">
-            <div className="loader-inner" style={{
-              width: '60px',
-              height: '60px',
-              border: '3px solid rgba(255,215,0,0.3)',
-              borderTop: '3px solid #FFD700',
-              borderRadius: '50%',
-              animation: 'spin 1s linear infinite',
-              margin: '0 auto'
-            }}></div>
+        <div style={{ textAlign: 'center' }}>
+          {/* Animated Logo */}
+          <div style={{
+            width: '80px',
+            height: '80px',
+            margin: '0 auto',
+            position: 'relative',
+            animation: 'pulse 1.5s ease-in-out infinite'
+          }}>
+            <div style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              background: 'linear-gradient(135deg, #FFD700, #FFA500)',
+              borderRadius: '20px',
+              transform: 'rotate(45deg)',
+              animation: 'spin 2s linear infinite'
+            }} />
+            <div style={{
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              fontSize: '32px',
+              fontWeight: 'bold',
+              color: '#000'
+            }}>T</div>
           </div>
-          <div className="loader-text" style={{ marginTop: '20px' }}>
-            <h2 style={{ color: '#FFD700' }}>TopTech Solutions</h2>
-            <p style={{ color: '#aaa' }}>Crafting Digital Excellence...</p>
+          
+          {/* Company Name */}
+          <h1 style={{ 
+            fontSize: '28px', 
+            color: '#FFD700', 
+            marginTop: '30px',
+            marginBottom: '20px',
+            fontWeight: '700',
+            letterSpacing: '2px',
+            animation: 'fadeInUp 0.8s ease'
+          }}>
+            TopTech Solutions
+          </h1>
+          
+          {/* Animated Dots */}
+          <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
+            <div style={{
+              width: '12px',
+              height: '12px',
+              background: '#FFD700',
+              borderRadius: '50%',
+              animation: 'bounce 1.4s ease-in-out infinite',
+              animationDelay: '0s'
+            }} />
+            <div style={{
+              width: '12px',
+              height: '12px',
+              background: '#FFD700',
+              borderRadius: '50%',
+              animation: 'bounce 1.4s ease-in-out infinite',
+              animationDelay: '0.2s'
+            }} />
+            <div style={{
+              width: '12px',
+              height: '12px',
+              background: '#FFD700',
+              borderRadius: '50%',
+              animation: 'bounce 1.4s ease-in-out infinite',
+              animationDelay: '0.4s'
+            }} />
           </div>
         </div>
+        
         <style>{`
+          @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.8; }
+          }
           @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            0% { transform: rotate(45deg); }
+            100% { transform: rotate(405deg); }
+          }
+          @keyframes bounce {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-15px); }
+          }
+          @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
           }
         `}</style>
       </div>
@@ -656,7 +770,19 @@ const Home = () => {
                 padding: '30px',
                 transition: 'all 0.3s ease'
               }}>
-                <div className="service-icon" style={{ marginBottom: '20px', color: '#FFD700' }}>
+                <div 
+                  className="service-icon" 
+                  style={{ 
+                    marginBottom: '20px', 
+                    color: '#FFD700',
+                    width: 'auto',
+                    height: 'auto',
+                    background: 'transparent',
+                    borderRadius: '0',
+                    transition: 'none',
+                    transform: 'none'
+                  }}
+                >
                   {renderIcon(service.icon_name, 48)}
                 </div>
                 <h3 style={{ fontSize: '24px', marginBottom: '15px' }}>{service.title}</h3>
@@ -879,54 +1005,179 @@ const Home = () => {
       </section>
 
       {/* Team Section */}
-      <section className="team-section" style={{ padding: '80px 0', background: '#0A0A0A' }}>
+      <section className="team-section" style={{ padding: '60px 0', background: '#0A0A0A' }}>
         <div className="container" style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 20px' }}>
-          <div className="section-header" style={{ textAlign: 'center', marginBottom: '50px' }}>
+          <div className="section-header" style={{ textAlign: 'center', marginBottom: '40px' }}>
             <span className="section-subtitle" style={{ fontSize: '14px', color: '#FFD700' }}>Our Team</span>
-            <h2 className="section-title" style={{ fontSize: '42px', margin: '10px 0' }}>Meet The <span style={{ color: '#FFD700' }}>Experts</span></h2>
+            <h2 className="section-title" style={{ fontSize: '36px', margin: '10px 0' }}>Meet The <span style={{ color: '#FFD700' }}>Experts</span></h2>
           </div>
 
           <div className="team-grid" style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-            gap: '30px'
+            gridTemplateColumns: 'repeat(4, 1fr)',
+            gap: '20px'
           }}>
             {team.map((member: any) => (
-              <div key={member.id} className="team-card" style={{
-                background: '#1a1a1a',
-                borderRadius: '20px',
-                overflow: 'hidden',
-                textAlign: 'center'
-              }}>
-                <div style={{ position: 'relative', aspectRatio: '1', overflow: 'hidden' }}>
-                  <img src={member.image} alt={member.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                  <div style={{
+              <div 
+                key={member.id} 
+                className="team-card-flip" 
+                style={{
+                  background: 'transparent',
+                  width: '100%',
+                  height: '360px',
+                  perspective: '1000px',
+                  cursor: 'pointer'
+                }}
+              >
+                <div 
+                  className="team-card-inner" 
+                  style={{
+                    position: 'relative',
+                    width: '100%',
+                    height: '100%',
+                    textAlign: 'center',
+                    transition: 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
+                    transformStyle: 'preserve-3d',
+                    borderRadius: '16px'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'rotateY(180deg)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'rotateY(0deg)';
+                  }}
+                >
+                  {/* FRONT SIDE */}
+                  <div className="team-card-front" style={{
                     position: 'absolute',
-                    bottom: '10px',
-                    left: 0,
-                    right: 0,
+                    width: '100%',
+                    height: '100%',
+                    backfaceVisibility: 'hidden',
+                    background: '#1a1a1a',
+                    borderRadius: '16px',
+                    overflow: 'hidden',
+                    textAlign: 'center',
                     display: 'flex',
-                    justifyContent: 'center',
-                    gap: '10px',
-                    opacity: 0,
-                    transition: 'opacity 0.3s ease'
+                    flexDirection: 'column'
                   }}>
-                    {member.social_linkedin && (
-                      <a href={member.social_linkedin} style={{ background: 'rgba(0,0,0,0.7)', padding: '8px', borderRadius: '50%' }}>
-                        <Linkedin size={16} color="#FFD700" />
-                      </a>
-                    )}
-                    {member.social_twitter && (
-                      <a href={member.social_twitter} style={{ background: 'rgba(0,0,0,0.7)', padding: '8px', borderRadius: '50%' }}>
-                        <Twitter size={16} color="#FFD700" />
-                      </a>
-                    )}
+                    <div style={{ height: '280px', overflow: 'hidden', flexShrink: 0 }}>
+                      <img 
+                        src={member.image} 
+                        alt={member.name} 
+                        style={{ 
+                          width: '100%', 
+                          height: '100%', 
+                          objectFit: 'cover',
+                          display: 'block'
+                        }} 
+                      />
+                    </div>
+                    <div style={{ 
+                      padding: '10px 8px', 
+                      flex: 1,
+                      display: 'flex',
+                      flexDirection: 'column',
+                      justifyContent: 'center'
+                    }}>
+                      <h3 style={{ fontSize: '16px', marginBottom: '4px', color: '#fff', lineHeight: 1.3 }}>{member.name}</h3>
+                      <p style={{ color: '#FFD700', fontSize: '12px', marginBottom: '0', lineHeight: 1.3 }}>{member.role}</p>
+                    </div>
                   </div>
-                </div>
-                <div style={{ padding: '20px' }}>
-                  <h3 style={{ fontSize: '22px', marginBottom: '5px' }}>{member.name}</h3>
-                  <p style={{ color: '#FFD700', fontSize: '14px', marginBottom: '10px' }}>{member.role}</p>
-                  <p style={{ fontSize: '13px', color: '#aaa' }}>{member.expertise}</p>
+
+                  {/* BACK SIDE */}
+                  <div className="team-card-back" style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    width: '100%',
+                    height: '100%',
+                    backfaceVisibility: 'hidden',
+                    background: 'linear-gradient(135deg, #1a1a1a, #0f0f0f)',
+                    borderRadius: '16px',
+                    transform: 'rotateY(180deg)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    padding: '20px',
+                    border: '1px solid rgba(255, 215, 0, 0.2)'
+                  }}>
+                    <h3 style={{ 
+                      fontSize: '18px', 
+                      color: '#FFD700', 
+                      marginBottom: '12px',
+                      textAlign: 'left',
+                      borderBottom: '2px solid rgba(255,215,0,0.3)',
+                      paddingBottom: '8px'
+                    }}>
+                      {member.name}
+                    </h3>
+                    
+                    <div style={{ marginBottom: '12px', textAlign: 'left', flex: 1 }}>
+                      <p style={{ 
+                        fontSize: '13px', 
+                        color: '#ccc', 
+                        lineHeight: '1.5',
+                        margin: 0
+                      }}>
+                        {member.about || member.expertise || 'Full-stack development expert specializing in React, Node.js, and cloud architecture.'}
+                      </p>
+                    </div>
+                    
+                    <div style={{ 
+                      marginBottom: '15px', 
+                      textAlign: 'left',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      flexWrap: 'wrap'
+                    }}>
+                      <span style={{ fontSize: '12px', color: '#aaa', fontWeight: '500' }}>Experience:</span>
+                      <span style={{ fontSize: '13px', color: '#FFD700', fontWeight: '600' }}>{member.experience || '8+ years'}</span>
+                      <div style={{ 
+                        flex: 1, 
+                        height: '3px', 
+                        background: '#333', 
+                        borderRadius: '2px', 
+                        overflow: 'hidden'
+                      }}>
+                        <div style={{ width: '70%', height: '100%', background: '#FFD700', borderRadius: '2px' }} />
+                      </div>
+                    </div>
+                    
+                    <div style={{ 
+                      display: 'flex', 
+                      gap: '12px', 
+                      justifyContent: 'center',
+                      paddingTop: '12px',
+                      borderTop: '1px solid rgba(255,215,0,0.15)'
+                    }}>
+                      {member.social_linkedin && member.social_linkedin !== '#' && (
+                        <a href={member.social_linkedin} target="_blank" rel="noopener noreferrer" style={{ background: 'rgba(255,215,0,0.1)', padding: '8px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '34px', height: '34px', transition: 'all 0.3s ease' }}>
+                          <Linkedin size={16} color="#FFD700" />
+                        </a>
+                      )}
+                      {member.social_twitter && member.social_twitter !== '#' && (
+                        <a href={member.social_twitter} target="_blank" rel="noopener noreferrer" style={{ background: 'rgba(255,215,0,0.1)', padding: '8px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '34px', height: '34px', transition: 'all 0.3s ease' }}>
+                          <Twitter size={16} color="#FFD700" />
+                        </a>
+                      )}
+                      {member.social_github && member.social_github !== '#' && (
+                        <a href={member.social_github} target="_blank" rel="noopener noreferrer" style={{ background: 'rgba(255,215,0,0.1)', padding: '8px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '34px', height: '34px', transition: 'all 0.3s ease' }}>
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FFD700" strokeWidth="2">
+                            <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
+                          </svg>
+                        </a>
+                      )}
+                      {member.social_instagram && member.social_instagram !== '#' && (
+                        <a href={member.social_instagram} target="_blank" rel="noopener noreferrer" style={{ background: 'rgba(255,215,0,0.1)', padding: '8px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '34px', height: '34px', transition: 'all 0.3s ease' }}>
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FFD700" strokeWidth="2">
+                            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+                            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+                            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+                          </svg>
+                        </a>
+                      )}
+                    </div>
+                  </div>
                 </div>
               </div>
             ))}
@@ -934,7 +1185,7 @@ const Home = () => {
         </div>
       </section>
       
-      {/* Pricing Section - Black color removed */}
+      {/* Pricing Section */}
       <section className="pricing-section" style={{ padding: '80px 0' }}>
         <div className="container" style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 20px' }}>
           <div className="section-header" style={{ textAlign: 'center', marginBottom: '50px' }}>
@@ -1406,6 +1657,36 @@ const Home = () => {
           <div className="section-header" style={{ textAlign: 'center', marginBottom: '50px' }}>
             <span className="section-subtitle" style={{ fontSize: '14px', color: '#FFD700' }}>Testimonials</span>
             <h2 className="section-title" style={{ fontSize: '42px', margin: '10px 0' }}>What <span style={{ color: '#FFD700' }}>Clients</span> Say</h2>
+            
+            {/* Share Your Experience Button */}
+            <button
+              onClick={() => setShowTestimonialModal(true)}
+              style={{
+                marginTop: '20px',
+                padding: '10px 24px',
+                background: 'transparent',
+                border: '2px solid #FFD700',
+                borderRadius: '50px',
+                color: '#FFD700',
+                fontSize: '14px',
+                fontWeight: '600',
+                cursor: 'pointer',
+                transition: 'all 0.3s ease',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = '#FFD700';
+                e.currentTarget.style.color = '#000';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'transparent';
+                e.currentTarget.style.color = '#FFD700';
+              }}
+            >
+              <Star size={16} /> Share Your Experience
+            </button>
           </div>
 
           <div className="testimonials-slider" style={{ position: 'relative', maxWidth: '800px', margin: '0 auto' }}>
@@ -1468,51 +1749,43 @@ const Home = () => {
                       background: '#1a1a1a',
                       borderRadius: '20px',
                       padding: '35px',
-                      textAlign: 'center'
+                      textAlign: 'center',
+                      display: 'flex',
+                      flexDirection: 'column'
                     }}>
-                      <div className="testimonial-rating" style={{ marginBottom: '20px' }}>
-                        {[...Array(testimonial.rating)].map((_, i) => (
-                          <Star key={i} size={18} fill="#FFD700" color="#FFD700" />
-                        ))}
-                      </div>
+                      {/* Testimonial Text */}
                       <p style={{
                         fontSize: '16px',
                         lineHeight: '1.6',
                         marginBottom: '25px',
-                        fontStyle: 'italic'
+                        fontStyle: 'italic',
+                        flex: 1
                       }}>"{testimonial.testimonial_text || testimonial.text}"</p>
-                      <div style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: '15px'
+                      
+                      {/* Sirf Name - No Image/Avatar */}
+                      <h4 style={{ 
+                        fontSize: '18px', 
+                        marginBottom: '12px', 
+                        color: '#fff',
+                        fontWeight: '600'
                       }}>
-                        <div style={{
-                          width: '50px',
-                          height: '50px',
-                          borderRadius: '50%',
-                          background: '#FFD700',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          fontSize: '20px',
-                          fontWeight: 'bold'
-                        }}>
-                          {testimonial.client_image || testimonial.image ? (
-                            <img 
-                              src={testimonial.client_image || testimonial.image} 
-                              alt={testimonial.client_name || testimonial.name}
-                              style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }}
-                            />
-                          ) : (
-                            <span>{(testimonial.client_name || testimonial.name || '').charAt(0)}</span>
-                          )}
-                        </div>
-                        <div style={{ textAlign: 'left' }}>
-                          <h4 style={{ fontSize: '18px', marginBottom: '5px' }}>{testimonial.client_name || testimonial.name}</h4>
-                          <p style={{ fontSize: '13px', color: '#FFD700', marginBottom: '3px' }}>{testimonial.client_role || testimonial.role}</p>
-                          <span style={{ fontSize: '12px', color: '#aaa' }}>{testimonial.client_company || testimonial.company}</span>
-                        </div>
+                        {testimonial.client_name || testimonial.name || 'Client'}
+                      </h4>
+                      
+                      {/* Stars - Neeche */}
+                      <div className="testimonial-rating" style={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                        gap: '5px'
+                      }}>
+                        {[...Array(5)].map((_, i) => (
+                          <Star 
+                            key={i} 
+                            size={18} 
+                            fill={i < (testimonial.rating || 5) ? "#FFD700" : "none"} 
+                            color="#FFD700" 
+                          />
+                        ))}
                       </div>
                     </div>
                   </div>
@@ -1564,6 +1837,165 @@ const Home = () => {
           </div>
         </div>
       </section>
+
+      {/* Testimonial Submission Modal */}
+      {showTestimonialModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.8)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 999999,
+          backdropFilter: 'blur(5px)',
+          padding: '20px'
+        }} onClick={() => setShowTestimonialModal(false)}>
+          <div style={{
+            backgroundColor: '#1a1a1a',
+            padding: '32px',
+            borderRadius: '24px',
+            width: '90%',
+            maxWidth: '450px',
+            boxShadow: '0 25px 50px rgba(0, 0, 0, 0.5)',
+            border: '1px solid rgba(255, 215, 0, 0.2)'
+          }} onClick={(e) => e.stopPropagation()}>
+            
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              marginBottom: '24px',
+              borderBottom: '1px solid rgba(255, 215, 0, 0.2)',
+              paddingBottom: '16px'
+            }}>
+              <h3 style={{
+                margin: 0,
+                fontSize: '22px',
+                fontWeight: '600',
+                color: '#FFD700'
+              }}>
+                Share Your Experience
+              </h3>
+              <button 
+                onClick={() => setShowTestimonialModal(false)}
+                style={{
+                  background: 'rgba(255,255,255,0.1)',
+                  border: 'none',
+                  fontSize: '20px',
+                  cursor: 'pointer',
+                  color: '#fff',
+                  width: '32px',
+                  height: '32px',
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
+              >
+                ✕
+              </button>
+            </div>
+            
+            <form onSubmit={handleTestimonialSubmit}>
+              {/* Name Field */}
+              <div style={{ marginBottom: '20px' }}>
+                <label style={{ display: 'block', marginBottom: '8px', fontSize: '13px', color: '#aaa' }}>
+                  Your Name *
+                </label>
+                <input
+                  type="text"
+                  placeholder="John Doe"
+                  value={testimonialFormData.name}
+                  onChange={(e) => setTestimonialFormData({...testimonialFormData, name: e.target.value})}
+                  required
+                  style={{
+                    width: '100%',
+                    padding: '12px 16px',
+                    borderRadius: '12px',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    background: 'rgba(255,255,255,0.05)',
+                    color: '#fff',
+                    fontSize: '14px',
+                    outline: 'none'
+                  }}
+                />
+              </div>
+              
+              {/* Rating Stars */}
+              <div style={{ marginBottom: '20px' }}>
+                <label style={{ display: 'block', marginBottom: '8px', fontSize: '13px', color: '#aaa' }}>
+                  Your Rating *
+                </label>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button
+                      key={star}
+                      type="button"
+                      onClick={() => setTestimonialFormData({...testimonialFormData, rating: star})}
+                      style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: 0 }}
+                    >
+                      <Star size={30} fill={star <= testimonialFormData.rating ? "#FFD700" : "none"} color="#FFD700" />
+                    </button>
+                  ))}
+                </div>
+              </div>
+              
+              {/* Testimonial Text */}
+              <div style={{ marginBottom: '24px' }}>
+                <label style={{ display: 'block', marginBottom: '8px', fontSize: '13px', color: '#aaa' }}>
+                  Your Testimonial *
+                </label>
+                <textarea
+                  placeholder="Share your experience..."
+                  rows={4}
+                  value={testimonialFormData.testimonial}
+                  onChange={(e) => setTestimonialFormData({...testimonialFormData, testimonial: e.target.value})}
+                  required
+                  style={{
+                    width: '100%',
+                    padding: '12px 16px',
+                    borderRadius: '12px',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    background: 'rgba(255,255,255,0.05)',
+                    color: '#fff',
+                    fontSize: '14px',
+                    resize: 'vertical',
+                    outline: 'none',
+                    fontFamily: 'inherit'
+                  }}
+                />
+              </div>
+              
+              <button
+                type="submit"
+                disabled={testimonialFormStatus === 'sending'}
+                style={{
+                  width: '100%',
+                  padding: '14px',
+                  background: 'linear-gradient(135deg, #FFD700, #FFA500)',
+                  color: '#000',
+                  border: 'none',
+                  borderRadius: '12px',
+                  cursor: 'pointer',
+                  fontSize: '15px',
+                  fontWeight: '600',
+                  opacity: testimonialFormStatus === 'sending' ? 0.7 : 1
+                }}
+              >
+                {testimonialFormStatus === 'sending' ? 'Submitting...' : 'Submit Testimonial'}
+              </button>
+              
+              <p style={{ fontSize: '11px', color: '#666', textAlign: 'center', marginTop: '16px' }}>
+                Your testimonial will be reviewed before publishing.
+              </p>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* FAQ Section */}
       <section className="faq-section" style={{ padding: '80px 0' }}>

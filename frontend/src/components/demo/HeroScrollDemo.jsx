@@ -13,10 +13,9 @@ export function HeroScrollDemo() {
       description: "Interactive 3D balls that follow mouse movement",
       tech: ["React Three Fiber", "GSAP"],
       images: [
-        "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&h=400&fit=crop",
-        "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=400&h=300&fit=crop",
-        "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=400&h=300&fit=crop",
-        "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=800&h=400&fit=crop"
+        "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&h=340&fit=crop",
+        "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=300&h=200&fit=crop",
+        "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=300&h=200&fit=crop"
       ]
     },
     {
@@ -25,34 +24,20 @@ export function HeroScrollDemo() {
       description: "Immersive 3D scene with character animation",
       tech: ["Spline", "React"],
       images: [
-        "https://images.unsplash.com/photo-1633356122102-3fe601e05bd2?w=800&h=400&fit=crop",
-        "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=400&h=300&fit=crop",
-        "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=400&h=300&fit=crop",
-        "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=800&h=400&fit=crop"
+        "https://images.unsplash.com/photo-1633356122102-3fe601e05bd2?w=600&h=340&fit=crop",
+        "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=300&h=200&fit=crop",
+        "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=300&h=200&fit=crop"
       ]
     },
     {
       id: 3,
-      title: "Portfolio",
+      title: "Modern Portfolio",
       description: "Modern portfolio with scroll animations",
-      tech: ["React", "Tailwind CSS"],
+      tech: ["React", "Tailwind CSS", "Framer Motion"],
       images: [
-        "https://images.unsplash.com/photo-1547658719-da2b51169166?w=800&h=400&fit=crop",
-        "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=400&h=300&fit=crop",
-        "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=400&h=300&fit=crop",
-        "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=800&h=400&fit=crop"
-      ]
-    },
-    {
-      id: 4,
-      title: "E-commerce",
-      description: "Admin dashboard with analytics",
-      tech: ["React", "Node.js", "MongoDB"],
-      images: [
-        "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&h=400&fit=crop",
-        "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=400&h=300&fit=crop",
-        "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=400&h=300&fit=crop",
-        "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=800&h=400&fit=crop"
+        "https://images.unsplash.com/photo-1547658719-da2b51169166?w=600&h=340&fit=crop",
+        "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=300&h=200&fit=crop",
+        "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=300&h=200&fit=crop"
       ]
     }
   ];
@@ -133,7 +118,7 @@ export function HeroScrollDemo() {
       minHeight: "100vh",
       width: "100%",
       margin: 0,
-      padding: 0
+      padding: "40px 0"
     }}>
       <ContainerScroll
         titleComponent={
@@ -170,13 +155,15 @@ export function HeroScrollDemo() {
               marginRight: "auto",
               color: "#aaa"
             }}>
-            
+              
             </p>
           </div>
         }
       >
         <div style={{ 
           width: "100%", 
+          maxWidth: "1350px",
+          margin: "0 auto",
           background: "linear-gradient(135deg, #0f172a, #0a0f1a)", 
           borderRadius: "24px", 
           overflow: "hidden",
@@ -199,31 +186,74 @@ export function HeroScrollDemo() {
             zIndex: 10
           }} />
           
-          {/* Content - Smaller size */}
+          {/* Content */}
           <div style={{ 
             display: "grid", 
-            gridTemplateColumns: "1fr 1fr"
+            gridTemplateColumns: "340px 1fr"
           }}>
             
             {/* Left side - Projects List */}
             <div style={{ 
-              padding: "20px", 
+              padding: "28px", 
               borderRight: "1px solid rgba(234, 179, 8, 0.1)",
               background: "rgba(15, 23, 42, 0.5)"
             }}>
-              <h3 style={{ 
-                fontSize: "16px", 
-                fontWeight: "600", 
-                color: "#FFD700", 
-                marginBottom: "14px", 
-                paddingBottom: "6px", 
-                borderBottom: "2px solid rgba(234, 179, 8, 0.3)",
-                display: "inline-block"
+              <div style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                marginBottom: "20px"
               }}>
-                All Projects
-              </h3>
+                <h3 style={{ 
+                  fontSize: "17px", 
+                  fontWeight: "600", 
+                  color: "#FFD700", 
+                  margin: 0,
+                  paddingBottom: "8px", 
+                  borderBottom: "2px solid rgba(234, 179, 8, 0.3)",
+                  display: "inline-block"
+                }}>
+                  Projects ({projects.length})
+                </h3>
+                
+                <div style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "12px"
+                }}>
+                  <div style={{
+                    width: "40px",
+                    height: "1px",
+                    background: "linear-gradient(90deg, #FFD700, transparent)"
+                  }} />
+                  <button
+                    onClick={() => window.location.href = '/portfolio'}
+                    style={{
+                      background: "transparent",
+                      border: "1px solid rgba(255,215,0,0.3)",
+                      borderRadius: "30px",
+                      padding: "6px 14px",
+                      fontSize: "12px",
+                      color: "#FFD700",
+                      cursor: "pointer",
+                      transition: "all 0.3s ease",
+                      fontWeight: "500"
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = "rgba(255,215,0,0.1)";
+                      e.currentTarget.style.borderColor = "#FFD700";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = "transparent";
+                      e.currentTarget.style.borderColor = "rgba(255,215,0,0.3)";
+                    }}
+                  >
+                    Show More →
+                  </button>
+                </div>
+              </div>
               
-              <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginTop: "6px" }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: "12px", marginTop: "8px" }}>
                 {projects.map((project, index) => (
                   <div
                     key={project.id}
@@ -231,8 +261,8 @@ export function HeroScrollDemo() {
                     onMouseEnter={() => setHoveredProject(index)}
                     onMouseLeave={() => setHoveredProject(null)}
                     style={{
-                      padding: "10px 14px",
-                      borderRadius: "10px",
+                      padding: "14px 16px",
+                      borderRadius: "12px",
                       transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
                       cursor: "pointer",
                       background: selectedProject === index 
@@ -250,44 +280,44 @@ export function HeroScrollDemo() {
                   >
                     <div style={{
                       display: "inline-flex",
-                      fontSize: "8px",
+                      fontSize: "10px",
                       fontWeight: "bold",
                       color: "#eab308",
                       background: "rgba(234, 179, 8, 0.15)",
-                      padding: "2px 6px",
+                      padding: "2px 10px",
                       borderRadius: "20px",
-                      marginBottom: "6px"
+                      marginBottom: "10px"
                     }}>
                       {(index + 1).toString().padStart(2, "0")}
                     </div>
                     
                     <h4 style={{ 
                       fontWeight: "600", 
-                      fontSize: "13px", 
+                      fontSize: "16px", 
                       color: selectedProject === index ? "#fbbf24" : "#FFFFFF", 
                       margin: 0, 
-                      marginBottom: "4px"
+                      marginBottom: "8px"
                     }}>
                       {project.title}
                     </h4>
                     
                     <p style={{ 
                       color: "#94a3b8", 
-                      fontSize: "10px", 
+                      fontSize: "12px", 
                       margin: 0, 
-                      lineHeight: "1.3",
-                      marginBottom: "6px"
+                      lineHeight: "1.4",
+                      marginBottom: "10px"
                     }}>
                       {project.description}
                     </p>
                     
-                    <div style={{ display: "flex", flexWrap: "wrap", gap: "4px" }}>
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
                       {project.tech.map((techItem, idx) => (
                         <span key={idx} style={{ 
-                          fontSize: "8px", 
+                          fontSize: "10px", 
                           color: "#eab308", 
                           background: "rgba(234, 179, 8, 0.12)", 
-                          padding: "2px 6px", 
+                          padding: "3px 10px", 
                           borderRadius: "20px"
                         }}>
                           {techItem}
@@ -299,58 +329,63 @@ export function HeroScrollDemo() {
               </div>
             </div>
 
-            {/* Right side - Image Gallery (Smaller images) */}
+            {/* Right side - 3 Images Gallery */}
             <div style={{ 
-              padding: "16px", 
-              background: "rgba(10, 15, 26, 0.3)"
+              padding: "20px", 
+              background: "rgba(10, 15, 26, 0.3)",
+              display: "flex",
+              flexDirection: "column",
+              gap: "12px"
             }}>
+              {/* Image 1 - Top large image */}
               <div style={{ 
-                display: "flex", 
-                flexDirection: "column", 
-                gap: "10px"
+                borderRadius: "14px", 
+                overflow: "hidden",
+                width: "100%"
               }}>
-                <div style={{ 
-                  borderRadius: "14px", 
-                  overflow: "hidden",
-                  transition: "transform 0.3s ease"
-                }}>
+                <img
+                  src={currentProject.images[0]}
+                  alt="Screenshot 1"
+                  style={{ 
+                    width: "100%", 
+                    height: "auto", 
+                    aspectRatio: "16/9",
+                    objectFit: "cover", 
+                    display: "block"
+                  }}
+                />
+              </div>
+              
+              {/* Images 2 & 3 - Two small images */}
+              <div style={{ 
+                display: "grid", 
+                gridTemplateColumns: "1fr 1fr", 
+                gap: "12px"
+              }}>
+                <div style={{ borderRadius: "12px", overflow: "hidden" }}>
                   <img
-                    src={currentProject.images[0]}
-                    alt="Screenshot 1"
-                    style={{ width: "100%", height: "auto", minHeight: "130px", objectFit: "cover", display: "block", transition: "transform 0.4s ease" }}
-                    onMouseEnter={(e) => e.currentTarget.style.transform = "scale(1.02)"}
-                    onMouseLeave={(e) => e.currentTarget.style.transform = "scale(1)"}
+                    src={currentProject.images[1]}
+                    alt="Screenshot 2"
+                    style={{ 
+                      width: "100%", 
+                      height: "auto", 
+                      aspectRatio: "4/3",
+                      objectFit: "cover", 
+                      display: "block"
+                    }}
                   />
                 </div>
-                
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
-                  <div style={{ borderRadius: "12px", overflow: "hidden" }}>
-                    <img
-                      src={currentProject.images[1]}
-                      alt="Screenshot 2"
-                      style={{ width: "100%", height: "auto", minHeight: "95px", objectFit: "cover", display: "block", transition: "transform 0.4s ease" }}
-                      onMouseEnter={(e) => e.currentTarget.style.transform = "scale(1.02)"}
-                      onMouseLeave={(e) => e.currentTarget.style.transform = "scale(1)"}
-                    />
-                  </div>
-                  <div style={{ borderRadius: "12px", overflow: "hidden" }}>
-                    <img
-                      src={currentProject.images[2]}
-                      alt="Screenshot 3"
-                      style={{ width: "100%", height: "auto", minHeight: "95px", objectFit: "cover", display: "block", transition: "transform 0.4s ease" }}
-                      onMouseEnter={(e) => e.currentTarget.style.transform = "scale(1.02)"}
-                      onMouseLeave={(e) => e.currentTarget.style.transform = "scale(1)"}
-                    />
-                  </div>
-                </div>
-                
-                <div style={{ borderRadius: "14px", overflow: "hidden" }}>
+                <div style={{ borderRadius: "12px", overflow: "hidden" }}>
                   <img
-                    src={currentProject.images[3]}
-                    alt="Screenshot 4"
-                    style={{ width: "100%", height: "auto", minHeight: "130px", objectFit: "cover", display: "block", transition: "transform 0.4s ease" }}
-                    onMouseEnter={(e) => e.currentTarget.style.transform = "scale(1.02)"}
-                    onMouseLeave={(e) => e.currentTarget.style.transform = "scale(1)"}
+                    src={currentProject.images[2]}
+                    alt="Screenshot 3"
+                    style={{ 
+                      width: "100%", 
+                      height: "auto", 
+                      aspectRatio: "4/3",
+                      objectFit: "cover", 
+                      display: "block"
+                    }}
                   />
                 </div>
               </div>

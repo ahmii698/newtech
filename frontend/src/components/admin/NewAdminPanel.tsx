@@ -1,4 +1,3 @@
-// src/components/admin/NewAdminPanel.tsx
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { 
@@ -46,6 +45,7 @@ export default function NewAdminPanel() {
   const [user, setUser] = useState<any>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [isMobile, setIsMobile] = useState(false);
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -53,19 +53,57 @@ export default function NewAdminPanel() {
     checkMobile();
     window.addEventListener('resize', checkMobile);
     
-    // ✅ DIRECT ACCESS - NO LOGIN REQUIRED
-    setUser({
-      name: 'Admin User',
-      email: 'admin@example.com',
-      role: 'admin'
-    });
+    // ✅ CHECK IF USER IS LOGGED IN
+    const token = localStorage.getItem('adminToken');
+    const userData = localStorage.getItem('adminUser');
+    
+    if (!token || !userData) {
+      navigate('/admin-login');
+      return;
+    }
+    
+    try {
+      const parsedUser = JSON.parse(userData);
+      setUser(parsedUser);
+    } catch (e) {
+      navigate('/admin-login');
+    }
+    
+    setIsCheckingAuth(false);
     
     return () => window.removeEventListener('resize', checkMobile);
-  }, []);
+  }, [navigate]);
 
   const logout = () => {
-    navigate("/");
+    localStorage.removeItem('adminToken');
+    localStorage.removeItem('adminUser');
+    navigate('/admin-login');
   };
+
+  if (isCheckingAuth) {
+    return (
+      <div style={{ 
+        background: '#0A0A0A', 
+        height: '100vh', 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'center' 
+      }}>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{
+            width: '48px',
+            height: '48px',
+            border: '3px solid #222222',
+            borderTop: '3px solid #667eea',
+            borderRadius: '50%',
+            animation: 'spin 1s linear infinite',
+            margin: '0 auto'
+          }} />
+          <p style={{ marginTop: '20px', color: '#666' }}>Checking authentication...</p>
+        </div>
+      </div>
+    );
+  }
 
   const activeTableData = TABLES.find(t => t.name === activeTable);
 
@@ -380,7 +418,7 @@ export default function NewAdminPanel() {
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/>
             </svg>
-            {sidebarOpen && "Back to Site"}
+            {sidebarOpen && "Logout"}
           </button>
         </div>
       </div>
@@ -503,15 +541,18 @@ export default function NewAdminPanel() {
           <DataTable table={activeTable} />
         </div>
       </div>
+
+      <style>{`
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+      `}</style>
     </div>
   );
 }
 
 // ==================== DATA TABLE COMPONENT ====================
-// (Keep all your existing DataTable, EmailReplyModal, Modal components exactly as they are - NO CHANGES NEEDED)
-// Baki ka code (DataTable, EmailReplyModal, Modal) bilkul waise hi rakho, kuch change mat karna
-
-// ==================== DATA TABLE COMPONENT WITH IMAGE UPLOAD & EMAIL REPLY ====================
 const DataTable = ({ table }: { table: string }) => {
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -527,7 +568,7 @@ const DataTable = ({ table }: { table: string }) => {
   const [uploadingImage, setUploadingImage] = useState(false);
   const rowsPerPage = 10;
 
-  const API_URL = 'http://localhost:8000/admin-api.php';
+  const API_URL = 'http://localhost:8000/api';
 
   // Image Upload Function
   const uploadImage = async (file: File): Promise<string | null> => {
@@ -536,7 +577,7 @@ const DataTable = ({ table }: { table: string }) => {
     
     try {
       const token = localStorage.getItem('adminToken');
-      const response = await fetch(`${API_URL}/upload.php`, {
+      const response = await fetch(`${API_URL}/upload`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -583,7 +624,7 @@ const DataTable = ({ table }: { table: string }) => {
     setLoading(true);
     try {
       const token = localStorage.getItem('adminToken');
-      const response = await fetch(`${API_URL}/admin/${table}`, {
+      const response = await fetch(`${API_URL}/${table}`, {
         headers: { 
           'Authorization': `Bearer ${token}`,
           'Accept': 'application/json'
@@ -615,7 +656,7 @@ const DataTable = ({ table }: { table: string }) => {
     if (!window.confirm("Delete this record?")) return;
     try {
       const token = localStorage.getItem('adminToken');
-      await fetch(`${API_URL}/admin/${table}/${id}`, {
+      await fetch(`${API_URL}/${table}/${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -633,7 +674,7 @@ const DataTable = ({ table }: { table: string }) => {
     try {
       const token = localStorage.getItem('adminToken');
       await Promise.all(selectedRows.map(id => 
-        fetch(`${API_URL}/admin/${table}/${id}`, {
+        fetch(`${API_URL}/${table}/${id}`, {
           method: 'DELETE',
           headers: { 'Authorization': `Bearer ${token}` }
         })
@@ -650,7 +691,7 @@ const DataTable = ({ table }: { table: string }) => {
     if (!editingRow) return;
     try {
       const token = localStorage.getItem('adminToken');
-      await fetch(`${API_URL}/admin/${table}/${editingRow.id}`, {
+      await fetch(`${API_URL}/${table}/${editingRow.id}`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -669,7 +710,7 @@ const DataTable = ({ table }: { table: string }) => {
   const handleCreate = async () => {
     try {
       const token = localStorage.getItem('adminToken');
-      await fetch(`${API_URL}/admin/${table}`, {
+      await fetch(`${API_URL}/${table}`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -686,7 +727,7 @@ const DataTable = ({ table }: { table: string }) => {
     }
   };
 
-  // Email Reply Handler - Works for both Plan Purchases and Appointments
+  // Email Reply Handler
   const handleEmailReply = (row: any, type: 'plan' | 'appointment') => {
     let email = '';
     let name = '';
@@ -773,13 +814,8 @@ const DataTable = ({ table }: { table: string }) => {
     return key.includes('image') || key.includes('img') || key.includes('photo') || key.includes('icon');
   };
 
-  // Check if current table has email fields
   const hasEmailField = (row: any) => {
     return row.email || row.customer_email;
-  };
-
-  const getCustomerName = (row: any) => {
-    return row.full_name || row.name || row.customer_name || 'Customer';
   };
 
   return (
@@ -1100,7 +1136,7 @@ const DataTable = ({ table }: { table: string }) => {
                               accentColor: "#667eea"
                             }}
                           />
-                        </td>
+                         </td>
                         {Object.entries(row).map(([key, val], i) => {
                           const isImage = isImageField(key);
                           
@@ -1141,7 +1177,7 @@ const DataTable = ({ table }: { table: string }) => {
                                   {String(val).length > 50 && '...'}
                                 </span>
                               )}
-                            </td>
+                             </td>
                           );
                         })}
                         <td style={{ 
@@ -1150,7 +1186,6 @@ const DataTable = ({ table }: { table: string }) => {
                           borderBottom: "1px solid #1a1a1a"
                         }}>
                           <div style={{ display: "flex", gap: "8px", justifyContent: "center", flexWrap: "wrap" }}>
-                            {/* Email Reply Button - Works for Plan Purchases AND Appointments */}
                             {hasEmailField(row) && (
                               <button
                                 onClick={() => {
@@ -1159,7 +1194,6 @@ const DataTable = ({ table }: { table: string }) => {
                                   } else if (table === 'appointments') {
                                     handleEmailReply(row, 'appointment');
                                   } else {
-                                    // Fallback for any table with email
                                     handleEmailReply(row, 'plan');
                                   }
                                 }}
@@ -1260,11 +1294,11 @@ const DataTable = ({ table }: { table: string }) => {
                               Delete
                             </button>
                           </div>
-                        </td>
-                      </tr>
+                         </td>
+                       </tr>
                     ))}
                   </tbody>
-                </table>
+                 </table>
 
                 {/* Pagination */}
                 {totalPages > 1 && (
@@ -1358,7 +1392,7 @@ const DataTable = ({ table }: { table: string }) => {
         )}
       </div>
 
-      {/* Email Reply Modal - Works for Both */}
+      {/* Email Reply Modal */}
       {showEmailModal && (
         <EmailReplyModal
           email={selectedEmail.to}
@@ -1370,7 +1404,7 @@ const DataTable = ({ table }: { table: string }) => {
         />
       )}
 
-      {/* Edit Modal with Image Upload */}
+      {/* Edit Modal */}
       {editingRow && (
         <Modal
           title="Edit Record"
@@ -1492,7 +1526,7 @@ const DataTable = ({ table }: { table: string }) => {
         </Modal>
       )}
 
-      {/* Add Modal with Image Upload */}
+      {/* Add Modal */}
       {addingNew && (
         <Modal
           title="Add New Record"

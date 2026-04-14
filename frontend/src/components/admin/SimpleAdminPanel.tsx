@@ -9,7 +9,7 @@ const TABLES = [
   "service_features", "statistics", "team_members", "technologies", "testimonials", "users", "appointments"
 ];
 
-const API_URL = 'http://localhost:8000/admin.php';
+const API_URL = 'http://localhost:8001/backend/admin.php';
 
 export default function SimpleAdminPanel() {
   const [activeTable, setActiveTable] = useState(TABLES[0]);

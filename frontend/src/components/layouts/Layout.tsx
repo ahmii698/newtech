@@ -1,4 +1,3 @@
-// components/layouts/Layout.tsx
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import Header from "./Header";
@@ -17,22 +16,20 @@ const Layout = ({ children }: Props) => {
     return saved ? JSON.parse(saved) : false;
   });
 
-  // 🔥 YAHAN BADLA - pehle true tha ab false kar diya
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     localStorage.setItem('darkMode', JSON.stringify(darkMode));
   }, [darkMode]);
 
-  // ✅ UN PAGES KE LIYE JO LAYOUT NAHI CHAHIYE
-  const noLayoutPaths = ['/admin', '/admin-login', '/forgot'];
+  // 🔥 ADMIN PANEL KE LIYE LAYOUT MAT DIKHAO
+  const noLayoutPaths = ['/simple-admin', '/admin', '/admin-login', '/forgot'];
   
-  // ✅ Check karo agar current path inme se koi hai to
   if (noLayoutPaths.includes(location.pathname)) {
     return <>{children}</>;
   }
 
-  // ✅ AGAR NORMAL PAGE HAI TO PURA LAYOUT DIKHAO
+  // ✅ NORMAL PAGES KE LIYE PURA LAYOUT
   return (
     <div className={`app ${darkMode ? 'dark' : ''}`}>
       <Header 
