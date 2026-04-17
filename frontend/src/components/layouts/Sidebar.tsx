@@ -27,7 +27,7 @@ const Sidebar = ({ isOpen, onClose, darkMode }: Props) => {
         <div className="sidebar-header">
           <div className="sidebar-logo">
             <span className="logo-icon">⚡</span>
-            <h3>Top<span>Tech</span></h3>
+            <h3>Fusix<span>Tech</span></h3>
           </div>
           <p className="sidebar-subtitle">IT Solutions Provider</p>
         </div>

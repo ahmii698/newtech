@@ -8,13 +8,25 @@ use Illuminate\Http\Request;
 
 class TestimonialController extends Controller
 {
-    // GET /api/testimonials - Sirf approved testimonials dikhao
-    public function index()
+    // GET /api/testimonials - Admin ke liye saare, public ke liye sirf approved
+    public function index(Request $request)
     {
-        $testimonials = Testimonial::approved()  // ✅ Sirf approved wale
-                    ->active()
-                    ->ordered()
-                    ->get();
+        // Check if request is from admin (has token)
+        $token = $request->bearerToken();
+        $isAdmin = !empty($token);
+        
+        if ($isAdmin) {
+            // Admin ko saare testimonials dikhao (pending + approved)
+            $testimonials = Testimonial::active()
+                        ->ordered()
+                        ->get();
+        } else {
+            // Public ko sirf approved testimonials dikhao
+            $testimonials = Testimonial::approved()
+                        ->active()
+                        ->ordered()
+                        ->get();
+        }
         
         return response()->json([
             'success' => true,
@@ -118,7 +130,7 @@ class TestimonialController extends Controller
         }
     }
     
-    // Optional: Admin ke liye pending testimonials fetch karne ka route
+    // Admin ke liye pending testimonials fetch karne ka route
     public function pending()
     {
         $testimonials = Testimonial::where('is_approved', false)

@@ -736,7 +736,7 @@ const Home = () => {
   return (
     <div className="home-container" style={{ overflowX: 'hidden', marginTop: 'clamp(60px, 10vw, 70px)' }}>
       
-      {/* ✅ VIP NEWSLETTER MODAL - SPACE FIXED (NO EXTRA PADDING/BOTTOM SPACE) */}
+      {/* ✅ VIP NEWSLETTER MODAL - LUXURY STYLE */}
       {showNewsletterModal && (
         <div style={{
           position: 'fixed',
@@ -745,7 +745,7 @@ const Home = () => {
           right: 0,
           bottom: 0,
           background: 'rgba(0, 0, 0, 0.9)',
-          backdropFilter: 'blur(12px)',
+          backdropFilter: 'blur(8px)',
           zIndex: 10000,
           display: 'flex',
           alignItems: 'center',
@@ -753,17 +753,20 @@ const Home = () => {
           animation: 'fadeIn 0.3s ease'
         }}>
           <div style={{
-            background: 'linear-gradient(145deg, #111111, #0a0a0a)',
+            background: 'linear-gradient(145deg, #0a0a0a, #050505)',
             borderRadius: '28px',
-            padding: '32px 28px',
-            maxWidth: '380px',
-            width: '88%',
+            padding: '36px 32px',
+            maxWidth: '400px',
+            width: '85%',
             textAlign: 'center',
-            border: '1px solid rgba(255, 215, 0, 0.25)',
-            boxShadow: '0 30px 60px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 215, 0, 0.05) inset',
+            border: '2px solid rgba(255, 215, 0, 0.4)',
+            boxShadow: '0 25px 50px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 215, 0, 0.1) inset',
             position: 'relative'
           }}>
             
+            {/* Crown Icon - VIP Badge */}
+           
+
             {/* Close Button */}
             <button
               onClick={closeNewsletterModal}
@@ -794,92 +797,94 @@ const Home = () => {
                 e.currentTarget.style.color = '#FFD700';
               }}
             >
-              <X size={14} />
+              <X size={16} />
             </button>
 
-            {/* Glowing Email Icon */}
+            {/* Email Icon with VIP Hover Effect */}
             <div
               style={{
-                width: '70px',
-                height: '70px',
+                width: '80px',
+                height: '80px',
                 background: 'linear-gradient(135deg, #FFD700, #FFA500)',
                 borderRadius: '50%',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                margin: '0 auto 16px auto',
-                boxShadow: '0 0 30px rgba(255, 215, 0, 0.4)',
-                transition: 'all 0.3s ease',
+                margin: '0 auto 20px auto',
+                boxShadow: '0 0 30px rgba(255, 215, 0, 0.5)',
+                transition: 'all 0.4s ease',
                 cursor: 'pointer'
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'scale(1.05)';
-                e.currentTarget.style.boxShadow = '0 0 45px rgba(255, 215, 0, 0.6)';
+                e.currentTarget.style.transform = 'scale(1.1)';
+                e.currentTarget.style.boxShadow = '0 0 50px rgba(255, 215, 0, 0.8)';
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.transform = 'scale(1)';
-                e.currentTarget.style.boxShadow = '0 0 30px rgba(255, 215, 0, 0.4)';
+                e.currentTarget.style.boxShadow = '0 0 30px rgba(255, 215, 0, 0.5)';
               }}
             >
-              <Mail size={34} color="#000" />
+              <Mail size={40} color="#000" />
             </div>
             
             <h2 style={{
-              fontSize: '22px',
+              fontSize: '26px',
               fontWeight: '800',
               background: 'linear-gradient(135deg, #FFD700, #FFA500)',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
               backgroundClip: 'text',
-              marginBottom: '8px',
+              marginBottom: '10px',
               letterSpacing: '-0.5px'
             }}>
-              Exclusive Updates
+              Join the Elite
             </h2>
             
             <p style={{
-              fontSize: '12px',
-              color: 'rgba(255, 255, 255, 0.7)',
-              lineHeight: '1.5',
-              marginBottom: '20px'
+              fontSize: '14px',
+              color: '#aaa',
+              lineHeight: '1.6',
+              marginBottom: '24px'
             }}>
-              Get <span style={{ color: '#FFD700', fontWeight: '600' }}>VIP tech insights</span> and offers delivered to your inbox.
+              Get <span style={{ color: '#FFD700', fontWeight: '600' }}>exclusive tech insights</span>, early access to offers, and VIP updates delivered to your inbox.
             </p>
             
             <form onSubmit={handleModalNewsletterSubmit}>
               <div style={{
                 position: 'relative',
-                marginBottom: '14px'
+                marginBottom: '16px'
               }}>
                 <input
                   type="email"
-                  placeholder="Your email address"
+                  placeholder="your@email.com"
                   value={modalNewsletterEmail}
                   onChange={(e) => setModalNewsletterEmail(e.target.value)}
                   required
                   style={{
                     width: '100%',
-                    padding: '12px 16px',
+                    padding: '14px 20px',
                     borderRadius: '50px',
-                    border: '2px solid rgba(255, 215, 0, 0.25)',
-                    background: 'rgba(0, 0, 0, 0.5)',
+                    border: '2px solid rgba(255, 215, 0, 0.3)',
+                    background: 'rgba(0, 0, 0, 0.6)',
                     color: '#fff',
-                    fontSize: '12px',
+                    fontSize: '14px',
                     outline: 'none',
                     boxSizing: 'border-box',
-                    transition: 'all 0.3s ease'
+                    transition: 'all 0.3s ease',
+                    fontFamily: 'monospace'
                   }}
                   onFocus={(e) => {
                     e.target.style.borderColor = '#FFD700';
-                    e.target.style.boxShadow = '0 0 15px rgba(255, 215, 0, 0.2)';
-                    e.target.style.background = 'rgba(0, 0, 0, 0.7)';
+                    e.target.style.boxShadow = '0 0 15px rgba(255, 215, 0, 0.3)';
+                    e.target.style.background = 'rgba(0, 0, 0, 0.8)';
                   }}
                   onBlur={(e) => {
-                    e.target.style.borderColor = 'rgba(255, 215, 0, 0.25)';
+                    e.target.style.borderColor = 'rgba(255, 215, 0, 0.3)';
                     e.target.style.boxShadow = 'none';
-                    e.target.style.background = 'rgba(0, 0, 0, 0.5)';
+                    e.target.style.background = 'rgba(0, 0, 0, 0.6)';
                   }}
                 />
+              
               </div>
               
               <button
@@ -887,21 +892,23 @@ const Home = () => {
                 disabled={modalNewsletterStatus === 'sending'}
                 style={{
                   width: '100%',
-                  padding: '12px 16px',
+                  padding: '14px 20px',
                   background: 'linear-gradient(135deg, #FFD700, #FFA500)',
                   border: 'none',
                   borderRadius: '50px',
                   color: '#000',
-                  fontWeight: '700',
-                  fontSize: '13px',
+                  fontWeight: '800',
+                  fontSize: '15px',
                   cursor: 'pointer',
                   transition: 'all 0.3s ease',
-                  opacity: modalNewsletterStatus === 'sending' ? 0.7 : 1
+                  opacity: modalNewsletterStatus === 'sending' ? 0.7 : 1,
+                  textTransform: 'uppercase',
+                  letterSpacing: '1px'
                 }}
                 onMouseEnter={(e) => {
                   if (modalNewsletterStatus !== 'sending') {
-                    e.currentTarget.style.transform = 'translateY(-1px)';
-                    e.currentTarget.style.boxShadow = '0 5px 20px rgba(255, 215, 0, 0.3)';
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                    e.currentTarget.style.boxShadow = '0 8px 25px rgba(255, 215, 0, 0.4)';
                   }
                 }}
                 onMouseLeave={(e) => {
@@ -912,32 +919,46 @@ const Home = () => {
                 {modalNewsletterStatus === 'sending' ? (
                   <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
                     <span className="spinner" style={{
-                      width: '14px',
-                      height: '14px',
+                      width: '16px',
+                      height: '16px',
                       border: '2px solid #000',
                       borderTop: '2px solid transparent',
                       borderRadius: '50%',
                       animation: 'spin 0.8s linear infinite',
                       display: 'inline-block'
                     }}></span>
-                    Subscribing...
+                    Processing...
                   </span>
                 ) : (
-                  'Subscribe →'
+                  'Subscribe '
                 )}
               </button>
               
               {modalNewsletterStatus === 'success' && (
-                <p style={{ color: '#4ade80', fontSize: '11px', marginTop: '12px', marginBottom: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
-                  <span>✓</span> Welcome VIP! Sound enabled.
+                <p style={{ color: '#4ade80', fontSize: '12px', marginTop: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
+                  ✓ Welcome to the VIP club! Sound enabled.
                 </p>
               )}
               {modalNewsletterStatus === 'error' && (
-                <p style={{ color: '#f87171', fontSize: '11px', marginTop: '12px', marginBottom: 0 }}>
+                <p style={{ color: '#f87171', fontSize: '12px', marginTop: '14px' }}>
                   {modalNewsletterError}
                 </p>
               )}
             </form>
+            
+            <p style={{
+              fontSize: '11px',
+              color: '#555',
+              marginTop: '20px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '8px',
+              borderTop: '1px solid rgba(255, 215, 0, 0.1)',
+              paddingTop: '16px'
+            }}>
+              
+            </p>
           </div>
         </div>
       )}
@@ -1125,7 +1146,6 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Rest of the sections remain the same as your original code... */}
       {/* Services Section */}
       <section className="services-section" style={{ padding: 'clamp(40px, 10vw, 80px) 0' }}>
         <div className="container" style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 20px' }}>
@@ -2824,13 +2844,13 @@ const Home = () => {
             opacity: 1;
           }
         }
-        @keyframes spin {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
-        }
         @keyframes scrollStats {
           0% { transform: translateX(0); }
           100% { transform: translateX(-50%); }
+        }
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
         }
         
         @media (max-width: 768px) {

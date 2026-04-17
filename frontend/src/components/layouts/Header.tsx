@@ -47,7 +47,7 @@ const Header = ({ darkMode, setDarkMode, setSidebarOpen }: Props) => {
               <Menu size={24} />
             </button>
             <Link to="/" className="logo-link">
-              <h2 className="logo">Top<span>Tech</span></h2>
+              <h2 className="logo">Fusix<span>Tech</span></h2>
             </Link>
           </div>
 
@@ -71,9 +71,7 @@ const Header = ({ darkMode, setDarkMode, setSidebarOpen }: Props) => {
             </div>
 
             <div className="search-container">
-              <button className="search-toggle" onClick={() => setSearchOpen(!searchOpen)}>
-                <Search size={20} />
-              </button>
+             
               
               {searchOpen && (
                 <div className="search-bar">
@@ -99,14 +97,12 @@ const Header = ({ darkMode, setDarkMode, setSidebarOpen }: Props) => {
                 <Menu size={24} />
               </button>
               <Link to="/" className="logo-link">
-                <h2 className="logo">Top<span>Tech</span></h2>
+                <h2 className="logo">Fusix<span>Tech</span></h2>
               </Link>
             </div>
 
             <div className="search-container">
-              <button className="search-toggle mobile-search" onClick={() => setSearchOpen(!searchOpen)}>
-                <Search size={16} />
-              </button>
+           
               
               {searchOpen && (
                 <div className="search-bar mobile-search-bar">

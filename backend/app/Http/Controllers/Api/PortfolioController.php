@@ -5,24 +5,18 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Portfolio;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class PortfolioController extends Controller
 {
-    // GET /api/portfolio - Saare portfolio items lao
     public function index(Request $request)
     {
         try {
-            $query = Portfolio::with('technologies')->where('is_active', true);
+            $query = Portfolio::where('is_active', true);
             
-            // Filter by category
             if ($request->has('category') && $request->category != 'all') {
                 $query->where('category', $request->category);
-            }
-            
-            // Filter by featured
-            if ($request->has('featured')) {
-                $query->where('is_featured', $request->featured);
             }
             
             $portfolio = $query->orderBy('order_number')->get();
@@ -39,11 +33,10 @@ class PortfolioController extends Controller
         }
     }
     
-    // GET /api/portfolio/{id} - Ek specific portfolio item
     public function show($id)
     {
         try {
-            $portfolio = Portfolio::with('technologies')->find($id);
+            $portfolio = Portfolio::find($id);
             
             if (!$portfolio) {
                 return response()->json([
@@ -64,28 +57,24 @@ class PortfolioController extends Controller
         }
     }
 
-    // POST /api/portfolio - Naya portfolio item create karo
     public function store(Request $request)
     {
         try {
-            // Remove unwanted fields
-            $data = $request->all();
-            unset($data['id']);
-            unset($data['created_at']);
-            unset($data['updated_at']);
-            unset($data['technologies']);
+            $data = $request->except(['id', 'created_at', 'updated_at', 'technologies']);
+            
+            if ($request->hasFile('image')) {
+                $imageFile = $request->file('image');
+                $filename = 'img-' . time() . '-' . Str::random(10) . '.' . $imageFile->getClientOriginalExtension();
+                $imagePath = $imageFile->storeAs('uploads/portfolio', $filename, 'public');
+                $data['image'] = '/storage/' . $imagePath;
+            }
             
             $portfolio = Portfolio::create($data);
-            
-            // Handle technologies relationship if needed
-            if ($request->has('technologies') && is_array($request->technologies)) {
-                $portfolio->technologies()->sync($request->technologies);
-            }
             
             return response()->json([
                 'success' => true,
                 'message' => 'Portfolio item created successfully',
-                'data' => $portfolio->load('technologies')
+                'data' => $portfolio
             ]);
         } catch (\Exception $e) {
             return response()->json([
@@ -95,7 +84,7 @@ class PortfolioController extends Controller
         }
     }
 
-    // PUT /api/portfolio/{id} - Portfolio item update karo
+    // ✅ COMPLETE FIXED UPDATE METHOD
     public function update(Request $request, $id)
     {
         try {
@@ -108,25 +97,35 @@ class PortfolioController extends Controller
                 ], 404);
             }
             
-            // Remove unwanted fields
-            $data = $request->all();
-            unset($data['id']);
-            unset($data['created_at']);
-            unset($data['updated_at']);
-            unset($data['technologies']);
+            // Get all data except unwanted fields
+            $data = $request->except(['id', 'created_at', 'updated_at', 'technologies']);
             
-            $portfolio->update($data);
-            
-            // Update technologies relationship if needed
-            if ($request->has('technologies') && is_array($request->technologies)) {
-                $portfolio->technologies()->sync($request->technologies);
+            // ✅ HANDLE IMAGE UPLOAD - File upload from admin panel
+            if ($request->hasFile('image')) {
+                // Delete old image if exists
+                if ($portfolio->image && !empty($portfolio->image)) {
+                    $oldPath = str_replace('/storage/', '', $portfolio->image);
+                    if (Storage::disk('public')->exists($oldPath)) {
+                        Storage::disk('public')->delete($oldPath);
+                    }
+                }
+                
+                // Store new image
+                $imageFile = $request->file('image');
+                $filename = 'img-' . time() . '-' . Str::random(10) . '.' . $imageFile->getClientOriginalExtension();
+                $imagePath = $imageFile->storeAs('uploads/portfolio', $filename, 'public');
+                $data['image'] = '/storage/' . $imagePath;
             }
+            
+            // Update the portfolio
+            $portfolio->update($data);
             
             return response()->json([
                 'success' => true,
                 'message' => 'Portfolio item updated successfully',
-                'data' => $portfolio->load('technologies')
+                'data' => $portfolio
             ]);
+            
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -135,7 +134,6 @@ class PortfolioController extends Controller
         }
     }
 
-    // DELETE /api/portfolio/{id} - Portfolio item delete karo
     public function destroy($id)
     {
         try {
@@ -148,43 +146,20 @@ class PortfolioController extends Controller
                 ], 404);
             }
             
-            // Detach technologies first
-            $portfolio->technologies()->detach();
+            // Delete image file
+            if ($portfolio->image && !empty($portfolio->image)) {
+                $imagePath = str_replace('/storage/', '', $portfolio->image);
+                if (Storage::disk('public')->exists($imagePath)) {
+                    Storage::disk('public')->delete($imagePath);
+                }
+            }
             
-            // Delete the portfolio
             $portfolio->delete();
             
             return response()->json([
                 'success' => true,
                 'message' => 'Portfolio item deleted successfully'
             ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'error' => $e->getMessage()
-            ], 500);
-        }
-    }
-    
-    // Image upload function specifically for portfolio
-    public function uploadImage(Request $request)
-    {
-        try {
-            if ($request->hasFile('image')) {
-                $file = $request->file('image');
-                $filename = time() . '_' . preg_replace('/[^a-zA-Z0-9._-]/', '', $file->getClientOriginalName());
-                $path = $file->storeAs('uploads/portfolio', $filename, 'public');
-                
-                return response()->json([
-                    'success' => true,
-                    'url' => '/storage/' . $path
-                ]);
-            }
-            
-            return response()->json([
-                'success' => false,
-                'error' => 'No image file'
-            ], 400);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,

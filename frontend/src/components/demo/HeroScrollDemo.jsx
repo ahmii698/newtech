@@ -74,13 +74,13 @@ export function HeroScrollDemo() {
     
     switch(linePosition.side) {
       case "top":
-        return { ...baseStyle, top: -3, left: `${linePosition.progress}%`, width: "90px", height: "5px", transform: "translateX(-50%)" };
+        return { ...baseStyle, top: -3, left: `${linePosition.progress}%`, width: "clamp(60px, 8vw, 90px)", height: "4px", transform: "translateX(-50%)" };
       case "right":
-        return { ...baseStyle, top: `${linePosition.progress}%`, right: -3, width: "5px", height: "90px", transform: "translateY(-50%)" };
+        return { ...baseStyle, top: `${linePosition.progress}%`, right: -3, width: "4px", height: "clamp(60px, 8vw, 90px)", transform: "translateY(-50%)" };
       case "bottom":
-        return { ...baseStyle, bottom: -3, left: `${linePosition.progress}%`, width: "90px", height: "5px", transform: "translateX(-50%)" };
+        return { ...baseStyle, bottom: -3, left: `${linePosition.progress}%`, width: "clamp(60px, 8vw, 90px)", height: "4px", transform: "translateX(-50%)" };
       case "left":
-        return { ...baseStyle, top: `${linePosition.progress}%`, left: -3, width: "5px", height: "90px", transform: "translateY(-50%)" };
+        return { ...baseStyle, top: `${linePosition.progress}%`, left: -3, width: "4px", height: "clamp(60px, 8vw, 90px)", transform: "translateY(-50%)" };
       default:
         return {};
     }
@@ -98,13 +98,13 @@ export function HeroScrollDemo() {
     
     switch(linePosition.side) {
       case "top":
-        return { ...baseTrailStyle, top: -3, left: 0, width: `${linePosition.progress}%`, height: "5px" };
+        return { ...baseTrailStyle, top: -3, left: 0, width: `${linePosition.progress}%`, height: "4px" };
       case "right":
-        return { ...baseTrailStyle, top: 0, right: -3, height: `${linePosition.progress}%`, width: "5px" };
+        return { ...baseTrailStyle, top: 0, right: -3, height: `${linePosition.progress}%`, width: "4px" };
       case "bottom":
-        return { ...baseTrailStyle, bottom: -3, left: 0, width: `${linePosition.progress}%`, height: "5px" };
+        return { ...baseTrailStyle, bottom: -3, left: 0, width: `${linePosition.progress}%`, height: "4px" };
       case "left":
-        return { ...baseTrailStyle, top: 0, left: -3, height: `${linePosition.progress}%`, width: "5px" };
+        return { ...baseTrailStyle, top: 0, left: -3, height: `${linePosition.progress}%`, width: "4px" };
       default:
         return {};
     }
@@ -118,25 +118,25 @@ export function HeroScrollDemo() {
       minHeight: "100vh",
       width: "100%",
       margin: 0,
-      padding: "40px 0"
+      padding: "clamp(30px, 5vw, 40px) 0"
     }}>
       <ContainerScroll
         titleComponent={
           <div style={{ textAlign: "center", padding: "0 20px" }}>
             <span style={{ 
-              fontSize: "clamp(12px, 4vw, 18px)", 
-              letterSpacing: "4px", 
+              fontSize: "clamp(10px, 3vw, 14px)", 
+              letterSpacing: "clamp(2px, 1vw, 4px)", 
               color: "#FFD700", 
               display: "block", 
-              marginBottom: "15px", 
+              marginBottom: "12px", 
               fontWeight: "600" 
             }}>
               OUR WORK
             </span>
             
             <h1 style={{ 
-              fontSize: "clamp(28px, 8vw, 52px)", 
-              margin: "15px 0", 
+              fontSize: "clamp(24px, 6vw, 42px)", 
+              margin: "10px 0", 
               lineHeight: "1.2", 
               fontWeight: "800", 
               textShadow: "2px 2px 4px rgba(0,0,0,0.5)",
@@ -144,19 +144,6 @@ export function HeroScrollDemo() {
             }}>
               Featured <span style={{ color: "#FFD700" }}>Projects</span>
             </h1>
-            
-            <p style={{ 
-              fontSize: "clamp(14px, 4vw, 15px)", 
-              marginBottom: "25px", 
-              opacity: 0.95, 
-              lineHeight: "1.5", 
-              maxWidth: "700px", 
-              marginLeft: "auto", 
-              marginRight: "auto",
-              color: "#aaa"
-            }}>
-              
-            </p>
           </div>
         }
       >
@@ -165,7 +152,7 @@ export function HeroScrollDemo() {
           maxWidth: "1350px",
           margin: "0 auto",
           background: "linear-gradient(135deg, #0f172a, #0a0f1a)", 
-          borderRadius: "24px", 
+          borderRadius: "clamp(16px, 3vw, 24px)", 
           overflow: "hidden",
           position: "relative",
           boxShadow: "0 25px 50px -12px rgba(0,0,0,0.5)"
@@ -180,36 +167,40 @@ export function HeroScrollDemo() {
             left: 0,
             right: 0,
             bottom: 0,
-            borderRadius: "24px",
+            borderRadius: "clamp(16px, 3vw, 24px)",
             border: "1px solid rgba(255, 215, 0, 0.15)",
             pointerEvents: "none",
             zIndex: 10
           }} />
           
-          {/* Content */}
+          {/* Content - Same 2 column layout on all devices, just responsive sizes */}
           <div style={{ 
             display: "grid", 
-            gridTemplateColumns: "340px 1fr"
+            gridTemplateColumns: "minmax(260px, 340px) 1fr",
+            overflow: "hidden"
           }}>
             
             {/* Left side - Projects List */}
             <div style={{ 
-              padding: "28px", 
+              padding: "clamp(16px, 4vw, 28px)", 
               borderRight: "1px solid rgba(234, 179, 8, 0.1)",
-              background: "rgba(15, 23, 42, 0.5)"
+              background: "rgba(15, 23, 42, 0.5)",
+              overflowY: "auto"
             }}>
               <div style={{
                 display: "flex",
                 justifyContent: "space-between",
                 alignItems: "center",
-                marginBottom: "20px"
+                flexWrap: "wrap",
+                gap: "10px",
+                marginBottom: "16px"
               }}>
                 <h3 style={{ 
-                  fontSize: "17px", 
+                  fontSize: "clamp(14px, 3vw, 17px)", 
                   fontWeight: "600", 
                   color: "#FFD700", 
                   margin: 0,
-                  paddingBottom: "8px", 
+                  paddingBottom: "6px", 
                   borderBottom: "2px solid rgba(234, 179, 8, 0.3)",
                   display: "inline-block"
                 }}>
@@ -219,10 +210,10 @@ export function HeroScrollDemo() {
                 <div style={{
                   display: "flex",
                   alignItems: "center",
-                  gap: "12px"
+                  gap: "8px"
                 }}>
                   <div style={{
-                    width: "40px",
+                    width: "clamp(20px, 5vw, 40px)",
                     height: "1px",
                     background: "linear-gradient(90deg, #FFD700, transparent)"
                   }} />
@@ -232,12 +223,13 @@ export function HeroScrollDemo() {
                       background: "transparent",
                       border: "1px solid rgba(255,215,0,0.3)",
                       borderRadius: "30px",
-                      padding: "6px 14px",
-                      fontSize: "12px",
+                      padding: "clamp(4px, 1.5vw, 6px) clamp(10px, 3vw, 14px)",
+                      fontSize: "clamp(10px, 2.5vw, 12px)",
                       color: "#FFD700",
                       cursor: "pointer",
                       transition: "all 0.3s ease",
-                      fontWeight: "500"
+                      fontWeight: "500",
+                      whiteSpace: "nowrap"
                     }}
                     onMouseEnter={(e) => {
                       e.currentTarget.style.background = "rgba(255,215,0,0.1)";
@@ -253,7 +245,7 @@ export function HeroScrollDemo() {
                 </div>
               </div>
               
-              <div style={{ display: "flex", flexDirection: "column", gap: "12px", marginTop: "8px" }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginTop: "8px" }}>
                 {projects.map((project, index) => (
                   <div
                     key={project.id}
@@ -261,7 +253,7 @@ export function HeroScrollDemo() {
                     onMouseEnter={() => setHoveredProject(index)}
                     onMouseLeave={() => setHoveredProject(null)}
                     style={{
-                      padding: "14px 16px",
+                      padding: "clamp(10px, 2.5vw, 14px) clamp(12px, 3vw, 16px)",
                       borderRadius: "12px",
                       transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
                       cursor: "pointer",
@@ -275,49 +267,49 @@ export function HeroScrollDemo() {
                         : hoveredProject === index
                           ? "1px solid rgba(234, 179, 8, 0.2)"
                           : "1px solid rgba(255, 255, 255, 0.05)",
-                      transform: hoveredProject === index ? "translateX(5px)" : "translateX(0)"
+                      transform: hoveredProject === index && window.innerWidth >= 768 ? "translateX(5px)" : "translateX(0)"
                     }}
                   >
                     <div style={{
                       display: "inline-flex",
-                      fontSize: "10px",
+                      fontSize: "clamp(8px, 2vw, 10px)",
                       fontWeight: "bold",
                       color: "#eab308",
                       background: "rgba(234, 179, 8, 0.15)",
-                      padding: "2px 10px",
+                      padding: "2px 8px",
                       borderRadius: "20px",
-                      marginBottom: "10px"
+                      marginBottom: "8px"
                     }}>
                       {(index + 1).toString().padStart(2, "0")}
                     </div>
                     
                     <h4 style={{ 
                       fontWeight: "600", 
-                      fontSize: "16px", 
+                      fontSize: "clamp(13px, 3vw, 16px)", 
                       color: selectedProject === index ? "#fbbf24" : "#FFFFFF", 
                       margin: 0, 
-                      marginBottom: "8px"
+                      marginBottom: "6px"
                     }}>
                       {project.title}
                     </h4>
                     
                     <p style={{ 
                       color: "#94a3b8", 
-                      fontSize: "12px", 
+                      fontSize: "clamp(10px, 2.5vw, 12px)", 
                       margin: 0, 
                       lineHeight: "1.4",
-                      marginBottom: "10px"
+                      marginBottom: "8px"
                     }}>
                       {project.description}
                     </p>
                     
-                    <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: "5px" }}>
                       {project.tech.map((techItem, idx) => (
                         <span key={idx} style={{ 
-                          fontSize: "10px", 
+                          fontSize: "clamp(8px, 2vw, 10px)", 
                           color: "#eab308", 
                           background: "rgba(234, 179, 8, 0.12)", 
-                          padding: "3px 10px", 
+                          padding: "2px 8px", 
                           borderRadius: "20px"
                         }}>
                           {techItem}
@@ -331,15 +323,15 @@ export function HeroScrollDemo() {
 
             {/* Right side - 3 Images Gallery */}
             <div style={{ 
-              padding: "20px", 
+              padding: "clamp(12px, 3vw, 20px)", 
               background: "rgba(10, 15, 26, 0.3)",
               display: "flex",
               flexDirection: "column",
-              gap: "12px"
+              gap: "clamp(8px, 2vw, 12px)"
             }}>
               {/* Image 1 - Top large image */}
               <div style={{ 
-                borderRadius: "14px", 
+                borderRadius: "clamp(10px, 2.5vw, 14px)", 
                 overflow: "hidden",
                 width: "100%"
               }}>
@@ -360,9 +352,9 @@ export function HeroScrollDemo() {
               <div style={{ 
                 display: "grid", 
                 gridTemplateColumns: "1fr 1fr", 
-                gap: "12px"
+                gap: "clamp(8px, 2vw, 12px)"
               }}>
-                <div style={{ borderRadius: "12px", overflow: "hidden" }}>
+                <div style={{ borderRadius: "clamp(8px, 2vw, 12px)", overflow: "hidden" }}>
                   <img
                     src={currentProject.images[1]}
                     alt="Screenshot 2"
@@ -375,7 +367,7 @@ export function HeroScrollDemo() {
                     }}
                   />
                 </div>
-                <div style={{ borderRadius: "12px", overflow: "hidden" }}>
+                <div style={{ borderRadius: "clamp(8px, 2vw, 12px)", overflow: "hidden" }}>
                   <img
                     src={currentProject.images[2]}
                     alt="Screenshot 3"

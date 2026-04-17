@@ -1,12 +1,15 @@
-// app/Models/Technology.php
 <?php
 
-namespace App\models;
+namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
 class Technology extends Model
 {
+    protected $table = 'technologies';
+    
+    protected $primaryKey = 'id';
+    
     protected $fillable = [
         'name',
         'icon',
@@ -19,8 +22,10 @@ class Technology extends Model
         'is_active' => 'boolean',
         'display_order' => 'integer'
     ];
+    
+    // ✅ IMPORTANT: Disable timestamps
+    public $timestamps = false;
 
-    // Scopes for easy filtering
     public function scopeActive($query)
     {
         return $query->where('is_active', true);
@@ -28,6 +33,6 @@ class Technology extends Model
 
     public function scopeOrdered($query)
     {
-        return $query->orderBy('display_order');
+        return $query->orderBy('display_order', 'asc');
     }
 }

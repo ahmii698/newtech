@@ -1,178 +1,193 @@
 <?php
+
 namespace App\Http\Controllers\Api;
 
-use App\Models\Technology;
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class TechnologyController extends Controller
 {
-    /**
-     * Display a listing of all technologies (for admin panel)
-     */
     public function index()
     {
-        $technologies = Technology::orderBy('display_order')->get();
-        return response()->json([
-            'success' => true,
-            'data' => $technologies
-        ]);
+        try {
+            $technologies = DB::table('technologies')->orderBy('display_order')->get();
+            return response()->json([
+                'success' => true,
+                'data' => $technologies
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
-    /**
-     * Get active technologies grouped by category (for frontend)
-     */
     public function getActiveTechnologies()
     {
-        $technologies = Technology::where('is_active', true)
-            ->orderBy('display_order')
-            ->get()
-            ->groupBy('category');
-        
-        return response()->json([
-            'success' => true,
-            'data' => $technologies
-        ]);
+        try {
+            $technologies = DB::table('technologies')
+                ->where('is_active', 1)
+                ->orderBy('display_order')
+                ->get()
+                ->groupBy('category');
+            
+            return response()->json([
+                'success' => true,
+                'data' => $technologies
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
-    /**
-     * Store a newly created technology
-     */
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'name' => 'required|max:100',
-            'icon' => 'required|max:50',
-            'category' => 'required|max:50',
-            'display_order' => 'nullable|integer',
-            'is_active' => 'nullable|boolean'
-        ]);
+        try {
+            $id = DB::table('technologies')->insertGetId([
+                'name' => $request->name,
+                'icon' => $request->icon,
+                'category' => $request->category,
+                'display_order' => $request->display_order ?? 0,
+                'is_active' => $request->is_active ?? 1
+            ]);
 
-        $technology = Technology::create([
-            'name' => $validated['name'],
-            'icon' => $validated['icon'],
-            'category' => $validated['category'],
-            'display_order' => $validated['display_order'] ?? 0,
-            'is_active' => $validated['is_active'] ?? true
-        ]);
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Technology created successfully',
-            'data' => $technology
-        ], 201);
+            return response()->json([
+                'success' => true,
+                'message' => 'Technology created successfully',
+                'data' => ['id' => $id]
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
-    /**
-     * Display the specified technology
-     */
     public function show($id)
     {
-        $technology = Technology::find($id);
-
-        if (!$technology) {
+        try {
+            $technology = DB::table('technologies')->where('id', $id)->first();
+            if (!$technology) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Technology not found'
+                ], 404);
+            }
+            return response()->json([
+                'success' => true,
+                'data' => $technology
+            ]);
+        } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Technology not found'
-            ], 404);
+                'error' => $e->getMessage()
+            ], 500);
         }
-
-        return response()->json([
-            'success' => true,
-            'data' => $technology
-        ]);
     }
 
-    /**
-     * Update the specified technology
-     */
     public function update(Request $request, $id)
     {
-        $technology = Technology::find($id);
+        try {
+            $technology = DB::table('technologies')->where('id', $id)->first();
+            if (!$technology) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Technology not found'
+                ], 404);
+            }
+            
+            $updateData = [];
+            if ($request->has('name')) $updateData['name'] = $request->name;
+            if ($request->has('icon')) $updateData['icon'] = $request->icon;
+            if ($request->has('category')) $updateData['category'] = $request->category;
+            if ($request->has('display_order')) $updateData['display_order'] = $request->display_order;
+            if ($request->has('is_active')) $updateData['is_active'] = $request->is_active;
+            
+            DB::table('technologies')->where('id', $id)->update($updateData);
 
-        if (!$technology) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Technology updated successfully'
+            ]);
+        } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Technology not found'
-            ], 404);
+                'error' => $e->getMessage()
+            ], 500);
         }
-
-        $validated = $request->validate([
-            'name' => 'sometimes|max:100',
-            'icon' => 'sometimes|max:50',
-            'category' => 'sometimes|max:50',
-            'display_order' => 'nullable|integer',
-            'is_active' => 'nullable|boolean'
-        ]);
-
-        $technology->update($validated);
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Technology updated successfully',
-            'data' => $technology
-        ]);
     }
 
-    /**
-     * Remove the specified technology
-     */
     public function destroy($id)
     {
-        $technology = Technology::find($id);
-
-        if (!$technology) {
+        try {
+            $technology = DB::table('technologies')->where('id', $id)->first();
+            if (!$technology) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Technology not found'
+                ], 404);
+            }
+            DB::table('technologies')->where('id', $id)->delete();
+            return response()->json([
+                'success' => true,
+                'message' => 'Technology deleted successfully'
+            ]);
+        } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Technology not found'
-            ], 404);
+                'error' => $e->getMessage()
+            ], 500);
         }
-
-        $technology->delete();
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Technology deleted successfully'
-        ]);
     }
 
-    /**
-     * Toggle technology active status
-     */
     public function toggleStatus($id)
     {
-        $technology = Technology::find($id);
-
-        if (!$technology) {
+        try {
+            $technology = DB::table('technologies')->where('id', $id)->first();
+            if (!$technology) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Technology not found'
+                ], 404);
+            }
+            $newStatus = $technology->is_active ? 0 : 1;
+            DB::table('technologies')->where('id', $id)->update(['is_active' => $newStatus]);
+            return response()->json([
+                'success' => true,
+                'message' => 'Status updated successfully',
+                'is_active' => $newStatus == 1
+            ]);
+        } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Technology not found'
-            ], 404);
+                'error' => $e->getMessage()
+            ], 500);
         }
-
-        $technology->is_active = !$technology->is_active;
-        $technology->save();
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Status updated successfully',
-            'is_active' => $technology->is_active
-        ]);
     }
 
-    /**
-     * Get all categories
-     */
     public function getCategories()
     {
-        $categories = Technology::select('category')
-            ->distinct()
-            ->orderBy('category')
-            ->pluck('category');
-
-        return response()->json([
-            'success' => true,
-            'data' => $categories
-        ]);
+        try {
+            $categories = DB::table('technologies')
+                ->select('category')
+                ->distinct()
+                ->orderBy('category')
+                ->pluck('category');
+            return response()->json([
+                'success' => true,
+                'data' => $categories
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 }

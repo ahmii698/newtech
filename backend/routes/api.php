@@ -27,11 +27,15 @@ use App\Http\Controllers\Api\SettingController;
 use App\Http\Controllers\Api\TechnologyController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\HeroSectionController;
+use App\Http\Controllers\Api\FaqImageController;
+use App\Http\Controllers\Api\ServiceFeatureController;
 
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\AppointmentController;
 use App\Http\Controllers\Admin\PlanPurchaseController;
 use App\Http\Controllers\Admin\EmailController;
+
+use App\Http\Controllers\ImageUploadController;
 
 /*
 |--------------------------------------------------------------------------
@@ -116,6 +120,9 @@ Route::get('/testimonials/{id}', [TestimonialController::class, 'show']);
 Route::post('/testimonials', [TestimonialController::class, 'store']);
 Route::put('/testimonials/{id}', [TestimonialController::class, 'update']);
 Route::delete('/testimonials/{id}', [TestimonialController::class, 'destroy']);
+// Approve Testimonial Route (Admin only)
+Route::put('/testimonials/{id}/approve', [TestimonialController::class, 'approve']);
+Route::get('/testimonials/pending', [TestimonialController::class, 'pending']);
 
 // Services - Full CRUD
 Route::get('/services/{id}', [ServiceController::class, 'show']);
@@ -159,11 +166,18 @@ Route::post('/statistics', [StatisticController::class, 'store']);
 Route::put('/statistics/{id}', [StatisticController::class, 'update']);
 Route::delete('/statistics/{id}', [StatisticController::class, 'destroy']);
 
-// Company Info - Full CRUD
+// Company Info - Full CRUD (Hyphen version)
 Route::get('/company-info/{id}', [CompanyInfoController::class, 'show']);
 Route::post('/company-info', [CompanyInfoController::class, 'store']);
 Route::put('/company-info/{id}', [CompanyInfoController::class, 'update']);
 Route::delete('/company-info/{id}', [CompanyInfoController::class, 'destroy']);
+
+// ✅ IMPORTANT: Underscore version for admin panel
+Route::get('/company_info', [CompanyInfoController::class, 'index']);
+Route::get('/company_info/{id}', [CompanyInfoController::class, 'show']);
+Route::post('/company_info', [CompanyInfoController::class, 'store']);
+Route::put('/company_info/{id}', [CompanyInfoController::class, 'update']);
+Route::delete('/company_info/{id}', [CompanyInfoController::class, 'destroy']);
 
 // Settings - Full CRUD
 Route::get('/settings/{id}', [SettingController::class, 'show']);
@@ -191,7 +205,44 @@ Route::delete('/hero_section/{id}', [HeroSectionController::class, 'destroy']);
 
 /*
 |--------------------------------------------------------------------------
-| 👥 TEAM MEMBERS - DIRECT DB ROUTES (FULL CRUD) - UPDATED
+| 🖼️ FAQ IMAGE ROUTES (FULL CRUD)
+|--------------------------------------------------------------------------
+*/
+
+Route::get('/faq-image', [FaqImageController::class, 'index']);
+Route::get('/faq-image/{id}', [FaqImageController::class, 'show']);
+Route::post('/faq-image', [FaqImageController::class, 'store']);
+Route::put('/faq-image/{id}', [FaqImageController::class, 'update']);
+Route::delete('/faq-image/{id}', [FaqImageController::class, 'destroy']);
+
+/*
+|--------------------------------------------------------------------------
+| 🔥 SERVICE FEATURES - FULL CRUD ROUTES (BOTH HYPHEN AND UNDERSCORE)
+|--------------------------------------------------------------------------
+*/
+
+/*
+|--------------------------------------------------------------------------
+| SERVICE FEATURES - FULL CRUD ROUTES
+|--------------------------------------------------------------------------
+*/
+
+Route::get('/service-features', [ServiceFeatureController::class, 'index']);
+Route::get('/service-features/{id}', [ServiceFeatureController::class, 'show']);
+Route::post('/service-features', [ServiceFeatureController::class, 'store']);
+Route::put('/service-features/{id}', [ServiceFeatureController::class, 'update']);
+Route::delete('/service-features/{id}', [ServiceFeatureController::class, 'destroy']);
+
+// Underscore version for admin panel
+Route::get('/service_features', [ServiceFeatureController::class, 'index']);
+Route::get('/service_features/{id}', [ServiceFeatureController::class, 'show']);
+Route::post('/service_features', [ServiceFeatureController::class, 'store']);
+Route::put('/service_features/{service_feature}', [ServiceFeatureController::class, 'update']);
+Route::delete('/service_features/{id}', [ServiceFeatureController::class, 'destroy']);
+
+/*
+|--------------------------------------------------------------------------
+| 👥 TEAM MEMBERS - DIRECT DB ROUTES (FULL CRUD)
 |--------------------------------------------------------------------------
 */
 
@@ -534,7 +585,7 @@ Route::prefix('admin')->group(function () {
 
 /*
 |--------------------------------------------------------------------------
-| 📋 ALL OTHER ADMIN TABLES ROUTES
+| 📋 ALL OTHER ADMIN TABLES ROUTES (WITH SORTING FOR APPOINTMENTS)
 |--------------------------------------------------------------------------
 */
 
@@ -542,11 +593,21 @@ $otherTables = [
     'newsletter_subscribers', 'pages', 'portfolio_technologies',
     'users', 'plan_purchases',
     'appointments', 'service_features', 'technologies',
-    'blog_posts', 'contact_messages', 'cta_section', 'company_info'
+    'blog_posts', 'contact_messages', 'cta_section', 'company_info',
+    'faq_images'
 ];
 
 foreach ($otherTables as $table) {
-    Route::get('/' . $table, [AdminController::class, 'index'])->defaults('table', $table);
+    // ✅ SPECIAL HANDLING FOR APPOINTMENTS - LATEST FIRST (DESCENDING)
+    if ($table === 'appointments') {
+        Route::get('/' . $table, function() {
+            $data = DB::table('appointments')->orderBy('created_at', 'desc')->orderBy('id', 'desc')->get();
+            return response()->json(['success' => true, 'data' => $data]);
+        });
+    } else {
+        Route::get('/' . $table, [AdminController::class, 'index'])->defaults('table', $table);
+    }
+    
     Route::get('/' . $table . '/{id}', [AdminController::class, 'show'])->defaults('table', $table);
     Route::post('/' . $table, [AdminController::class, 'store'])->defaults('table', $table);
     Route::put('/' . $table . '/{id}', [AdminController::class, 'update'])->defaults('table', $table);
@@ -602,8 +663,8 @@ Route::post('/send-email', [App\Http\Controllers\Admin\EmailController::class, '
 
 /*
 |--------------------------------------------------------------------------
-| 🎯 IMAGE UPLOAD ROUTE
+| 🎯 IMAGE UPLOAD ROUTE (USING IMAGEUPLOADCONTROLLER)
 |--------------------------------------------------------------------------
 */
 
-Route::post('/upload', [AdminController::class, 'uploadImage']);
+Route::post('/upload', [ImageUploadController::class, 'upload']);

@@ -3,111 +3,101 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\CompanyInfo;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class CompanyInfoController extends Controller
 {
-    // GET /api/company-info - Company info lao
     public function index()
     {
-        $info = CompanyInfo::first();
-        
+        $info = DB::table('company_info')->first();
         return response()->json([
             'success' => true,
             'data' => $info
         ]);
     }
     
-    // GET /api/company-info/{id} - Specific company info
     public function show($id)
     {
-        $info = CompanyInfo::find($id);
-        
+        $info = DB::table('company_info')->where('id', $id)->first();
         if(!$info) {
             return response()->json([
                 'success' => false,
                 'message' => 'Company info not found'
             ], 404);
         }
-        
         return response()->json([
             'success' => true,
             'data' => $info
         ]);
     }
 
-    // POST /api/company-info - Naya company info create karo
     public function store(Request $request)
     {
-        try {
-            $info = CompanyInfo::create($request->all());
-            
-            return response()->json([
-                'success' => true,
-                'message' => 'Company info created successfully',
-                'data' => $info
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'error' => $e->getMessage()
-            ], 500);
-        }
+        $id = DB::table('company_info')->insertGetId([
+            'address' => $request->address,
+            'phone' => $request->phone,
+            'email' => $request->email,
+            'business_hours' => $request->business_hours,
+            'map_embed_url' => $request->map_embed_url,
+            'facebook_url' => $request->facebook_url,
+            'twitter_url' => $request->twitter_url,
+            'instagram_url' => $request->instagram_url,
+            'linkedin_url' => $request->linkedin_url,
+            'created_at' => now(),
+            'updated_at' => now()
+        ]);
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'Company info created successfully',
+            'data' => ['id' => $id]
+        ]);
     }
 
-    // PUT /api/company-info/{id} - Company info update karo
     public function update(Request $request, $id)
-    {
-        try {
-            $info = CompanyInfo::find($id);
-            
-            if(!$info) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Company info not found'
-                ], 404);
-            }
-            
-            $info->update($request->all());
-            
-            return response()->json([
-                'success' => true,
-                'message' => 'Company info updated successfully',
-                'data' => $info
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'error' => $e->getMessage()
-            ], 500);
-        }
+{
+    $info = DB::table('company_info')->where('id', $id)->first();
+
+    if (!$info) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Company info not found'
+        ], 404);
     }
 
-    // DELETE /api/company-info/{id} - Company info delete karo
+    DB::table('company_info')->where('id', $id)->update([
+        'address' => $request->address ?? $info->address,
+        'phone' => $request->phone ?? $info->phone,
+        'email' => $request->email ?? $info->email,
+        'business_hours' => $request->business_hours ?? $info->business_hours,
+        'map_embed_url' => $request->map_embed_url ?? $info->map_embed_url,
+        'facebook_url' => $request->facebook_url ?? $info->facebook_url,
+        'twitter_url' => $request->twitter_url ?? $info->twitter_url,
+        'instagram_url' => $request->instagram_url ?? $info->instagram_url,
+        'linkedin_url' => $request->linkedin_url ?? $info->linkedin_url,
+        'updated_at' => now()
+    ]);
+
+    return response()->json([
+        'success' => true,
+        'message' => 'Updated successfully'
+    ]);
+}
+
     public function destroy($id)
     {
-        try {
-            $info = CompanyInfo::find($id);
-            
-            if(!$info) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Company info not found'
-                ], 404);
-            }
-            
-            $info->delete();
-            
-            return response()->json([
-                'success' => true,
-                'message' => 'Company info deleted successfully'
-            ]);
-        } catch (\Exception $e) {
+        $info = DB::table('company_info')->where('id', $id)->first();
+        if(!$info) {
             return response()->json([
                 'success' => false,
-                'error' => $e->getMessage()
-            ], 500);
+                'message' => 'Company info not found'
+            ], 404);
         }
+        DB::table('company_info')->where('id', $id)->delete();
+        return response()->json([
+            'success' => true,
+            'message' => 'Company info deleted successfully'
+        ]);
     }
 }
