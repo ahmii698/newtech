@@ -1,46 +1,81 @@
 import React, { useState, useEffect } from "react";
 import { ContainerScroll } from "../ui/container-scroll-animation";
+import API from '../../services/api';
 
 export function HeroScrollDemo() {
   const [selectedProject, setSelectedProject] = useState(0);
   const [hoveredProject, setHoveredProject] = useState(null);
   const [linePosition, setLinePosition] = useState({ side: "top", progress: 0 });
-  
-  const projects = [
-    {
-      id: 1,
-      title: "3D Balls",
-      description: "Interactive 3D balls that follow mouse movement",
-      tech: ["React Three Fiber", "GSAP"],
-      images: [
-        "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&h=340&fit=crop",
-        "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=300&h=200&fit=crop",
-        "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=300&h=200&fit=crop"
-      ]
-    },
-    {
-      id: 2,
-      title: "Spline 3D",
-      description: "Immersive 3D scene with character animation",
-      tech: ["Spline", "React"],
-      images: [
-        "https://images.unsplash.com/photo-1633356122102-3fe601e05bd2?w=600&h=340&fit=crop",
-        "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=300&h=200&fit=crop",
-        "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=300&h=200&fit=crop"
-      ]
-    },
-    {
-      id: 3,
-      title: "Modern Portfolio",
-      description: "Modern portfolio with scroll animations",
-      tech: ["React", "Tailwind CSS", "Framer Motion"],
-      images: [
-        "https://images.unsplash.com/photo-1547658719-da2b51169166?w=600&h=340&fit=crop",
-        "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=300&h=200&fit=crop",
-        "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=300&h=200&fit=crop"
-      ]
-    }
-  ];
+  const [projects, setProjects] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [isMobile, setIsMobile] = useState(false);
+  const [isTablet, setIsTablet] = useState(false);
+
+  // Check screen size for responsive design
+  useEffect(() => {
+    const checkScreenSize = () => {
+      const width = window.innerWidth;
+      setIsMobile(width < 768);
+      setIsTablet(width >= 768 && width < 1024);
+    };
+    
+    checkScreenSize();
+    window.addEventListener('resize', checkScreenSize);
+    return () => window.removeEventListener('resize', checkScreenSize);
+  }, []);
+
+  // Helper function to get image URL
+  const getImageUrl = (url) => {
+    if (!url) return null;
+    if (url.startsWith('http')) return url;
+    if (url.startsWith('/storage')) return `http://localhost:8000${url}`;
+    if (url.startsWith('storage')) return `http://localhost:8000/${url}`;
+    if (url.startsWith('uploads')) return `http://localhost:8000/${url}`;
+    return `http://localhost:8000/storage/uploads/${url}`;
+  };
+
+  // Fetch portfolio projects from API
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        const response = await API.get('/portfolio_projects');
+        console.log('Projects Response:', response.data);
+        
+        if (response.data && response.data.success && Array.isArray(response.data.data)) {
+          const formattedProjects = response.data.data.map(project => ({
+            id: project.id,
+            title: project.title || 'Untitled',
+            description: project.description || '',
+            tech: (() => {
+              try {
+                if (typeof project.technologies === 'string') {
+                  return JSON.parse(project.technologies);
+                }
+                return Array.isArray(project.technologies) ? project.technologies : [];
+              } catch (e) {
+                return [];
+              }
+            })(),
+            images: [
+              getImageUrl(project.image_1) || project.image_1 || 'https://via.placeholder.com/600x340?text=No+Image',
+              getImageUrl(project.image_2) || project.image_2 || 'https://via.placeholder.com/300x200?text=No+Image',
+              getImageUrl(project.image_3) || project.image_3 || 'https://via.placeholder.com/300x200?text=No+Image'
+            ]
+          }));
+          setProjects(formattedProjects);
+        } else {
+          setProjects([]);
+        }
+      } catch (error) {
+        console.error('Error fetching projects:', error);
+        setProjects([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchProjects();
+  }, []);
 
   const currentProject = projects[selectedProject];
 
@@ -74,13 +109,13 @@ export function HeroScrollDemo() {
     
     switch(linePosition.side) {
       case "top":
-        return { ...baseStyle, top: -3, left: `${linePosition.progress}%`, width: "clamp(60px, 8vw, 90px)", height: "4px", transform: "translateX(-50%)" };
+        return { ...baseStyle, top: -3, left: `${linePosition.progress}%`, width: "clamp(40px, 8vw, 60px)", height: "3px", transform: "translateX(-50%)" };
       case "right":
-        return { ...baseStyle, top: `${linePosition.progress}%`, right: -3, width: "4px", height: "clamp(60px, 8vw, 90px)", transform: "translateY(-50%)" };
+        return { ...baseStyle, top: `${linePosition.progress}%`, right: -3, width: "3px", height: "clamp(40px, 8vw, 60px)", transform: "translateY(-50%)" };
       case "bottom":
-        return { ...baseStyle, bottom: -3, left: `${linePosition.progress}%`, width: "clamp(60px, 8vw, 90px)", height: "4px", transform: "translateX(-50%)" };
+        return { ...baseStyle, bottom: -3, left: `${linePosition.progress}%`, width: "clamp(40px, 8vw, 60px)", height: "3px", transform: "translateX(-50%)" };
       case "left":
-        return { ...baseStyle, top: `${linePosition.progress}%`, left: -3, width: "4px", height: "clamp(60px, 8vw, 90px)", transform: "translateY(-50%)" };
+        return { ...baseStyle, top: `${linePosition.progress}%`, left: -3, width: "3px", height: "clamp(40px, 8vw, 60px)", transform: "translateY(-50%)" };
       default:
         return {};
     }
@@ -98,17 +133,72 @@ export function HeroScrollDemo() {
     
     switch(linePosition.side) {
       case "top":
-        return { ...baseTrailStyle, top: -3, left: 0, width: `${linePosition.progress}%`, height: "4px" };
+        return { ...baseTrailStyle, top: -3, left: 0, width: `${linePosition.progress}%`, height: "3px" };
       case "right":
-        return { ...baseTrailStyle, top: 0, right: -3, height: `${linePosition.progress}%`, width: "4px" };
+        return { ...baseTrailStyle, top: 0, right: -3, height: `${linePosition.progress}%`, width: "3px" };
       case "bottom":
-        return { ...baseTrailStyle, bottom: -3, left: 0, width: `${linePosition.progress}%`, height: "4px" };
+        return { ...baseTrailStyle, bottom: -3, left: 0, width: `${linePosition.progress}%`, height: "3px" };
       case "left":
-        return { ...baseTrailStyle, top: 0, left: -3, height: `${linePosition.progress}%`, width: "4px" };
+        return { ...baseTrailStyle, top: 0, left: -3, height: `${linePosition.progress}%`, width: "3px" };
       default:
         return {};
     }
   };
+
+  if (loading) {
+    return (
+      <div style={{ 
+        display: "flex", 
+        justifyContent: "center", 
+        alignItems: "center", 
+        minHeight: "400px",
+        background: "#0A0A0A"
+      }}>
+        <div style={{
+          width: "40px",
+          height: "40px",
+          border: "3px solid #222",
+          borderTop: "3px solid #FFD700",
+          borderRadius: "50%",
+          animation: "spin 1s linear infinite"
+        }} />
+      </div>
+    );
+  }
+
+  if (projects.length === 0) {
+    return (
+      <div style={{ 
+        display: "flex", 
+        justifyContent: "center", 
+        alignItems: "center", 
+        minHeight: "400px",
+        background: "#0A0A0A",
+        color: "#fff",
+        flexDirection: "column",
+        gap: "20px",
+        textAlign: "center",
+        padding: "20px"
+      }}>
+        <div style={{ fontSize: "48px" }}>📁</div>
+        <p>No projects found. Please add projects in admin panel.</p>
+        <button
+          onClick={() => window.location.href = '/admin'}
+          style={{
+            padding: "10px 20px",
+            background: "#FFD700",
+            color: "#000",
+            border: "none",
+            borderRadius: "8px",
+            cursor: "pointer",
+            fontWeight: "bold"
+          }}
+        >
+          Go to Admin Panel
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div style={{ 
@@ -118,31 +208,31 @@ export function HeroScrollDemo() {
       minHeight: "100vh",
       width: "100%",
       margin: 0,
-      padding: "clamp(30px, 5vw, 40px) 0"
+      padding: "clamp(20px, 5vw, 40px) 0"
     }}>
       <ContainerScroll
         titleComponent={
-          <div style={{ textAlign: "center", padding: "0 20px" }}>
+          <div style={{ textAlign: "center", padding: "0 16px" }}>
             <span style={{ 
               fontSize: "clamp(10px, 3vw, 14px)", 
               letterSpacing: "clamp(2px, 1vw, 4px)", 
               color: "#FFD700", 
               display: "block", 
-              marginBottom: "12px", 
+              marginBottom: "clamp(8px, 2vw, 12px)", 
               fontWeight: "600" 
             }}>
               OUR WORK
             </span>
             
             <h1 style={{ 
-              fontSize: "clamp(24px, 6vw, 42px)", 
-              margin: "10px 0", 
+              fontSize: "clamp(22px, 6vw, 42px)", 
+              margin: "clamp(8px, 2vw, 10px) 0", 
               lineHeight: "1.2", 
               fontWeight: "800", 
               textShadow: "2px 2px 4px rgba(0,0,0,0.5)",
               color: "#FFFFFF"
             }}>
-              Featured <span style={{ color: "#FFD700" }}>Projects</span>
+              Featured Projects
             </h1>
           </div>
         }
@@ -152,7 +242,7 @@ export function HeroScrollDemo() {
           maxWidth: "1350px",
           margin: "0 auto",
           background: "linear-gradient(135deg, #0f172a, #0a0f1a)", 
-          borderRadius: "clamp(16px, 3vw, 24px)", 
+          borderRadius: "clamp(12px, 3vw, 24px)", 
           overflow: "hidden",
           position: "relative",
           boxShadow: "0 25px 50px -12px rgba(0,0,0,0.5)"
@@ -167,25 +257,28 @@ export function HeroScrollDemo() {
             left: 0,
             right: 0,
             bottom: 0,
-            borderRadius: "clamp(16px, 3vw, 24px)",
+            borderRadius: "clamp(12px, 3vw, 24px)",
             border: "1px solid rgba(255, 215, 0, 0.15)",
             pointerEvents: "none",
             zIndex: 10
           }} />
           
-          {/* Content - Same 2 column layout on all devices, just responsive sizes */}
+          {/* ✅ RESPONSIVE LAYOUT */}
           <div style={{ 
-            display: "grid", 
-            gridTemplateColumns: "minmax(260px, 340px) 1fr",
+            display: "flex",
+            flexDirection: isMobile ? "column" : "row",
             overflow: "hidden"
           }}>
             
-            {/* Left side - Projects List */}
+            {/* Left side - Projects List - Mobile par top par dikhega */}
             <div style={{ 
-              padding: "clamp(16px, 4vw, 28px)", 
-              borderRight: "1px solid rgba(234, 179, 8, 0.1)",
+              width: isMobile ? "100%" : (isTablet ? "280px" : "340px"),
+              padding: isMobile ? "clamp(12px, 4vw, 16px)" : "clamp(16px, 4vw, 28px)", 
+              borderRight: isMobile ? "none" : "1px solid rgba(234, 179, 8, 0.1)",
+              borderBottom: isMobile ? "1px solid rgba(234, 179, 8, 0.1)" : "none",
               background: "rgba(15, 23, 42, 0.5)",
-              overflowY: "auto"
+              overflowY: "auto",
+              maxHeight: isMobile ? "auto" : "600px"
             }}>
               <div style={{
                 display: "flex",
@@ -196,7 +289,7 @@ export function HeroScrollDemo() {
                 marginBottom: "16px"
               }}>
                 <h3 style={{ 
-                  fontSize: "clamp(14px, 3vw, 17px)", 
+                  fontSize: isMobile ? "clamp(12px, 3.5vw, 14px)" : "clamp(14px, 3vw, 17px)", 
                   fontWeight: "600", 
                   color: "#FFD700", 
                   margin: 0,
@@ -204,7 +297,7 @@ export function HeroScrollDemo() {
                   borderBottom: "2px solid rgba(234, 179, 8, 0.3)",
                   display: "inline-block"
                 }}>
-                  Projects ({projects.length})
+                 RECENT WORK
                 </h3>
                 
                 <div style={{
@@ -213,7 +306,7 @@ export function HeroScrollDemo() {
                   gap: "8px"
                 }}>
                   <div style={{
-                    width: "clamp(20px, 5vw, 40px)",
+                    width: "clamp(15px, 4vw, 20px)",
                     height: "1px",
                     background: "linear-gradient(90deg, #FFD700, transparent)"
                   }} />
@@ -223,8 +316,8 @@ export function HeroScrollDemo() {
                       background: "transparent",
                       border: "1px solid rgba(255,215,0,0.3)",
                       borderRadius: "30px",
-                      padding: "clamp(4px, 1.5vw, 6px) clamp(10px, 3vw, 14px)",
-                      fontSize: "clamp(10px, 2.5vw, 12px)",
+                      padding: isMobile ? "4px 8px" : "clamp(4px, 1.5vw, 6px) clamp(8px, 2.5vw, 14px)",
+                      fontSize: isMobile ? "clamp(9px, 2.5vw, 11px)" : "clamp(10px, 2.5vw, 12px)",
                       color: "#FFD700",
                       cursor: "pointer",
                       transition: "all 0.3s ease",
@@ -245,16 +338,25 @@ export function HeroScrollDemo() {
                 </div>
               </div>
               
-              <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginTop: "8px" }}>
-                {projects.map((project, index) => (
+              {/* ✅ MOBILE: Sirf 1 project dikhega, baaki hidden */}
+              {/* ✅ TABLET/DESKTOP: Saare projects dikhenge */}
+              <div style={{ 
+                display: "flex", 
+                flexDirection: "column", 
+                gap: "clamp(8px, 2vw, 10px)", 
+                marginTop: "8px" 
+              }}>
+                {projects.slice(0, isMobile ? 1 : projects.length).map((project, index) => (
                   <div
                     key={project.id}
                     onClick={() => setSelectedProject(index)}
                     onMouseEnter={() => setHoveredProject(index)}
                     onMouseLeave={() => setHoveredProject(null)}
                     style={{
-                      padding: "clamp(10px, 2.5vw, 14px) clamp(12px, 3vw, 16px)",
-                      borderRadius: "12px",
+                      padding: isMobile 
+                        ? "clamp(8px, 2.5vw, 10px) clamp(10px, 3vw, 12px)" 
+                        : "clamp(10px, 2.5vw, 14px) clamp(12px, 3vw, 16px)",
+                      borderRadius: "clamp(8px, 2vw, 12px)",
                       transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
                       cursor: "pointer",
                       background: selectedProject === index 
@@ -267,54 +369,69 @@ export function HeroScrollDemo() {
                         : hoveredProject === index
                           ? "1px solid rgba(234, 179, 8, 0.2)"
                           : "1px solid rgba(255, 255, 255, 0.05)",
-                      transform: hoveredProject === index && window.innerWidth >= 768 ? "translateX(5px)" : "translateX(0)"
+                      transform: hoveredProject === index && !isMobile && window.innerWidth >= 768 ? "translateX(5px)" : "translateX(0)"
                     }}
                   >
                     <div style={{
                       display: "inline-flex",
-                      fontSize: "clamp(8px, 2vw, 10px)",
+                      fontSize: isMobile ? "clamp(7px, 2vw, 8px)" : "clamp(8px, 2vw, 10px)",
                       fontWeight: "bold",
                       color: "#eab308",
                       background: "rgba(234, 179, 8, 0.15)",
-                      padding: "2px 8px",
+                      padding: isMobile ? "2px 6px" : "2px 8px",
                       borderRadius: "20px",
-                      marginBottom: "8px"
+                      marginBottom: isMobile ? "6px" : "8px"
                     }}>
                       {(index + 1).toString().padStart(2, "0")}
                     </div>
                     
                     <h4 style={{ 
                       fontWeight: "600", 
-                      fontSize: "clamp(13px, 3vw, 16px)", 
+                      fontSize: isMobile ? "clamp(11px, 3vw, 13px)" : "clamp(13px, 3vw, 16px)", 
                       color: selectedProject === index ? "#fbbf24" : "#FFFFFF", 
                       margin: 0, 
-                      marginBottom: "6px"
+                      marginBottom: isMobile ? "4px" : "6px"
                     }}>
                       {project.title}
                     </h4>
                     
                     <p style={{ 
                       color: "#94a3b8", 
-                      fontSize: "clamp(10px, 2.5vw, 12px)", 
+                      fontSize: isMobile ? "clamp(9px, 2.5vw, 10px)" : "clamp(10px, 2.5vw, 12px)", 
                       margin: 0, 
                       lineHeight: "1.4",
-                      marginBottom: "8px"
+                      marginBottom: isMobile ? "6px" : "8px",
+                      display: "-webkit-box",
+                      WebkitLineClamp: 2,
+                      WebkitBoxOrient: "vertical",
+                      overflow: "hidden"
                     }}>
                       {project.description}
                     </p>
                     
-                    <div style={{ display: "flex", flexWrap: "wrap", gap: "5px" }}>
-                      {project.tech.map((techItem, idx) => (
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: isMobile ? "3px" : "5px" }}>
+                      {Array.isArray(project.tech) && project.tech.slice(0, isMobile ? 2 : 3).map((techItem, idx) => (
                         <span key={idx} style={{ 
-                          fontSize: "clamp(8px, 2vw, 10px)", 
+                          fontSize: isMobile ? "clamp(7px, 2vw, 8px)" : "clamp(8px, 2vw, 10px)", 
                           color: "#eab308", 
                           background: "rgba(234, 179, 8, 0.12)", 
-                          padding: "2px 8px", 
+                          padding: isMobile ? "2px 6px" : "2px 8px", 
                           borderRadius: "20px"
                         }}>
                           {techItem}
                         </span>
                       ))}
+                      {project.tech.length > (isMobile ? 2 : 3) && (
+                        <span style={{ 
+                          fontSize: isMobile ? "clamp(7px, 2vw, 8px)" : "clamp(8px, 2vw, 10px)", 
+                          color: "#eab308", 
+                          background: "rgba(234, 179, 8, 0.12)", 
+                          padding: isMobile ? "2px 6px" : "2px 8px", 
+                          borderRadius: "20px"
+                        }}>
+                          +{project.tech.length - (isMobile ? 2 : 3)}
+                        </span>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -323,60 +440,76 @@ export function HeroScrollDemo() {
 
             {/* Right side - 3 Images Gallery */}
             <div style={{ 
-              padding: "clamp(12px, 3vw, 20px)", 
+              flex: 1,
+              padding: isMobile ? "clamp(10px, 3vw, 16px)" : "clamp(12px, 3vw, 20px)", 
               background: "rgba(10, 15, 26, 0.3)",
               display: "flex",
               flexDirection: "column",
-              gap: "clamp(8px, 2vw, 12px)"
+              gap: isMobile ? "clamp(6px, 2vw, 8px)" : "clamp(8px, 2vw, 12px)"
             }}>
-              {/* Image 1 - Top large image */}
+              {/* Main large image */}
               <div style={{ 
-                borderRadius: "clamp(10px, 2.5vw, 14px)", 
+                borderRadius: isMobile ? "clamp(8px, 2vw, 10px)" : "clamp(10px, 2.5vw, 14px)", 
                 overflow: "hidden",
-                width: "100%"
+                width: "100%",
+                aspectRatio: "16/9"
               }}>
                 <img
-                  src={currentProject.images[0]}
+                  src={currentProject?.images?.[0] || 'https://via.placeholder.com/600x340?text=No+Image'}
                   alt="Screenshot 1"
                   style={{ 
                     width: "100%", 
-                    height: "auto", 
-                    aspectRatio: "16/9",
+                    height: "100%",
                     objectFit: "cover", 
                     display: "block"
+                  }}
+                  onError={(e) => {
+                    e.target.src = 'https://via.placeholder.com/600x340?text=No+Image';
                   }}
                 />
               </div>
               
-              {/* Images 2 & 3 - Two small images */}
+              {/* Two small images - Responsive grid */}
               <div style={{ 
                 display: "grid", 
                 gridTemplateColumns: "1fr 1fr", 
-                gap: "clamp(8px, 2vw, 12px)"
+                gap: isMobile ? "clamp(6px, 2vw, 8px)" : "clamp(8px, 2vw, 12px)"
               }}>
-                <div style={{ borderRadius: "clamp(8px, 2vw, 12px)", overflow: "hidden" }}>
+                <div style={{ 
+                  borderRadius: isMobile ? "clamp(6px, 2vw, 8px)" : "clamp(8px, 2vw, 12px)", 
+                  overflow: "hidden",
+                  aspectRatio: "4/3"
+                }}>
                   <img
-                    src={currentProject.images[1]}
+                    src={currentProject?.images?.[1] || 'https://via.placeholder.com/300x200?text=No+Image'}
                     alt="Screenshot 2"
                     style={{ 
                       width: "100%", 
-                      height: "auto", 
-                      aspectRatio: "4/3",
+                      height: "100%",
                       objectFit: "cover", 
                       display: "block"
                     }}
+                    onError={(e) => {
+                      e.target.src = 'https://via.placeholder.com/300x200?text=No+Image';
+                    }}
                   />
                 </div>
-                <div style={{ borderRadius: "clamp(8px, 2vw, 12px)", overflow: "hidden" }}>
+                <div style={{ 
+                  borderRadius: isMobile ? "clamp(6px, 2vw, 8px)" : "clamp(8px, 2vw, 12px)", 
+                  overflow: "hidden",
+                  aspectRatio: "4/3"
+                }}>
                   <img
-                    src={currentProject.images[2]}
+                    src={currentProject?.images?.[2] || 'https://via.placeholder.com/300x200?text=No+Image'}
                     alt="Screenshot 3"
                     style={{ 
                       width: "100%", 
-                      height: "auto", 
-                      aspectRatio: "4/3",
+                      height: "100%",
                       objectFit: "cover", 
                       display: "block"
+                    }}
+                    onError={(e) => {
+                      e.target.src = 'https://via.placeholder.com/300x200?text=No+Image';
                     }}
                   />
                 </div>
@@ -385,6 +518,13 @@ export function HeroScrollDemo() {
           </div>
         </div>
       </ContainerScroll>
+      
+      <style>{`
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+      `}</style>
     </div>
   );
 }

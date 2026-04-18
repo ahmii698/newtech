@@ -29,6 +29,8 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\HeroSectionController;
 use App\Http\Controllers\Api\FaqImageController;
 use App\Http\Controllers\Api\ServiceFeatureController;
+use App\Http\Controllers\Api\PortfolioSettingController;
+use App\Http\Controllers\Api\PortfolioProjectController;
 
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\AppointmentController;
@@ -166,13 +168,12 @@ Route::post('/statistics', [StatisticController::class, 'store']);
 Route::put('/statistics/{id}', [StatisticController::class, 'update']);
 Route::delete('/statistics/{id}', [StatisticController::class, 'destroy']);
 
-// Company Info - Full CRUD (Hyphen version)
-Route::get('/company-info/{id}', [CompanyInfoController::class, 'show']);
-Route::post('/company-info', [CompanyInfoController::class, 'store']);
-Route::put('/company-info/{id}', [CompanyInfoController::class, 'update']);
-Route::delete('/company-info/{id}', [CompanyInfoController::class, 'destroy']);
+/*
+|--------------------------------------------------------------------------
+| 🏢 COMPANY INFO ROUTES (UNDERSCORE VERSION)
+|--------------------------------------------------------------------------
+*/
 
-// ✅ IMPORTANT: Underscore version for admin panel
 Route::get('/company_info', [CompanyInfoController::class, 'index']);
 Route::get('/company_info/{id}', [CompanyInfoController::class, 'show']);
 Route::post('/company_info', [CompanyInfoController::class, 'store']);
@@ -205,25 +206,27 @@ Route::delete('/hero_section/{id}', [HeroSectionController::class, 'destroy']);
 
 /*
 |--------------------------------------------------------------------------
-| 🖼️ FAQ IMAGE ROUTES (FULL CRUD)
+| 🖼️ FAQ IMAGE ROUTES (FULL CRUD) - BOTH HYPHEN AND UNDERSCORE
 |--------------------------------------------------------------------------
 */
 
+// Hyphen version
 Route::get('/faq-image', [FaqImageController::class, 'index']);
 Route::get('/faq-image/{id}', [FaqImageController::class, 'show']);
 Route::post('/faq-image', [FaqImageController::class, 'store']);
 Route::put('/faq-image/{id}', [FaqImageController::class, 'update']);
 Route::delete('/faq-image/{id}', [FaqImageController::class, 'destroy']);
 
-/*
-|--------------------------------------------------------------------------
-| 🔥 SERVICE FEATURES - FULL CRUD ROUTES (BOTH HYPHEN AND UNDERSCORE)
-|--------------------------------------------------------------------------
-*/
+// ✅ IMPORTANT: Underscore version for admin panel
+Route::get('/faq_images', [FaqImageController::class, 'index']);
+Route::get('/faq_images/{id}', [FaqImageController::class, 'show']);
+Route::post('/faq_images', [FaqImageController::class, 'store']);
+Route::put('/faq_images/{id}', [FaqImageController::class, 'update']);
+Route::delete('/faq_images/{id}', [FaqImageController::class, 'destroy']);
 
 /*
 |--------------------------------------------------------------------------
-| SERVICE FEATURES - FULL CRUD ROUTES
+| 🔥 SERVICE FEATURES - FULL CRUD ROUTES
 |--------------------------------------------------------------------------
 */
 
@@ -239,6 +242,28 @@ Route::get('/service_features/{id}', [ServiceFeatureController::class, 'show']);
 Route::post('/service_features', [ServiceFeatureController::class, 'store']);
 Route::put('/service_features/{service_feature}', [ServiceFeatureController::class, 'update']);
 Route::delete('/service_features/{id}', [ServiceFeatureController::class, 'destroy']);
+
+/*
+|--------------------------------------------------------------------------
+| 📁 PORTFOLIO SETTINGS ROUTES (UNDERSCORE VERSION)
+|--------------------------------------------------------------------------
+*/
+
+Route::get('/portfolio_settings', [PortfolioSettingController::class, 'index']);
+Route::get('/portfolio_settings/{id}', [PortfolioSettingController::class, 'show']);
+Route::put('/portfolio_settings/{id}', [PortfolioSettingController::class, 'update']);
+
+/*
+|--------------------------------------------------------------------------
+| 📁 PORTFOLIO PROJECTS ROUTES (FULL CRUD)
+|--------------------------------------------------------------------------
+*/
+
+Route::get('/portfolio_projects', [PortfolioProjectController::class, 'index']);
+Route::get('/portfolio_projects/{id}', [PortfolioProjectController::class, 'show']);
+Route::post('/portfolio_projects', [PortfolioProjectController::class, 'store']);
+Route::put('/portfolio_projects/{id}', [PortfolioProjectController::class, 'update']);
+Route::delete('/portfolio_projects/{id}', [PortfolioProjectController::class, 'destroy']);
 
 /*
 |--------------------------------------------------------------------------
@@ -590,11 +615,17 @@ Route::prefix('admin')->group(function () {
 */
 
 $otherTables = [
-    'newsletter_subscribers', 'pages', 'portfolio_technologies',
-    'users', 'plan_purchases',
-    'appointments', 'service_features', 'technologies',
-    'blog_posts', 'contact_messages', 'cta_section', 'company_info',
-    'faq_images'
+    'newsletter_subscribers', 
+    'pages', 
+    'portfolio_technologies',
+    'users', 
+    'plan_purchases',
+    'appointments', 
+    'service_features',
+    'blog_posts', 
+    'contact_messages', 
+    'cta_section'
+    // ✅ REMOVED: technologies, company_info, faq_images, portfolio_settings, portfolio_projects (all have specific routes now)
 ];
 
 foreach ($otherTables as $table) {

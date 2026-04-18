@@ -29,6 +29,7 @@ const TABLES = [
   { name: "team_members", icon: <FiUsers size={18} />, label: "Team Members" },
   { name: "technologies", icon: <FiCpu size={18} />, label: "Technologies" },
   { name: "testimonials", icon: <FiMessageCircle size={18} />, label: "Testimonials" },
+  { name: "portfolio_projects", icon: <FiBriefcase size={18} />, label: "Portfolio Projects" },
   { name: "users", icon: <FiUser size={18} />, label: "Users" }
 ];
 
@@ -665,15 +666,35 @@ const DataTable = ({ table, isMobile, isTablet }: { table: string; isMobile?: bo
       
       const result = await response.json();
       
-      if (result.data) {
-        setData(result.data);
+      console.log(`📥 ${table} API Response:`, result);
+      
+      let records = [];
+      
+      if (result.success && result.data) {
+        if (Array.isArray(result.data)) {
+          records = result.data;
+        } else if (typeof result.data === 'object' && result.data !== null) {
+          records = [result.data];
+        }
       } else if (Array.isArray(result)) {
-        setData(result);
-      } else {
-        setData([]);
+        records = result;
       }
+      
+      // ✅ NEWSLETTER TABLE - Sort by subscribed_at or created_at DESC (latest first)
+      if (table === 'newsletter_subscribers') {
+        records = records.sort((a, b) => {
+          const dateA = a.subscribed_at || a.created_at;
+          const dateB = b.subscribed_at || b.created_at;
+          return new Date(dateB).getTime() - new Date(dateA).getTime();
+        });
+      }
+      
+      setData(records);
+      
     } catch (error) {
+      console.error('Fetch error:', error);
       showMessage("Failed to load data", "error");
+      setData([]);
     } finally {
       setLoading(false);
     }
@@ -759,7 +780,7 @@ const DataTable = ({ table, isMobile, isTablet }: { table: string; isMobile?: bo
       if (result.success) {
         setEditingRow(null);
         showMessage("Record updated", "success");
-        fetchData();
+        fetchData(); 
       } else {
         showMessage(result.error || "Update failed", "error");
       }
@@ -878,8 +899,15 @@ const DataTable = ({ table, isMobile, isTablet }: { table: string; isMobile?: bo
     }
   };
 
+  // ✅ FIXED: Email button only for plan_purchases and appointments (NOT for newsletter)
   const hasEmailField = (row: any) => {
-    return row.email || row.customer_email;
+    const allowEmailForTables = ['plan_purchases', 'appointments'];
+    
+    if (allowEmailForTables.includes(table)) {
+      return row.email || row.customer_email;
+    }
+    
+    return false;
   };
 
   const isPendingTestimonial = (row: any) => {

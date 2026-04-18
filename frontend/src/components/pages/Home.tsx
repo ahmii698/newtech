@@ -231,12 +231,28 @@ const Home = () => {
 
   // ✅ ========== END OF SOUND + NEWSLETTER MODAL CODE ==========
 
-  // Fetch FAQ Image
+  // ✅ FIXED: Fetch FAQ Image - Directly from database
   const fetchFaqImage = async () => {
     try {
-      const response = await API.get('/faq-image');
+      // Use underscore version to match admin panel
+      const response = await API.get('/faq_images');
+      console.log('FAQ Image API Response:', response.data);
+      
       if (response.data.success && response.data.data) {
-        setFaqImage(response.data.data.image_url);
+        let imageData = response.data.data;
+        
+        // Handle both array and object responses
+        if (Array.isArray(imageData) && imageData.length > 0) {
+          imageData = imageData[0];
+        }
+        
+        if (imageData && imageData.image_url) {
+          const imageUrl = getImageUrl(imageData.image_url);
+          setFaqImage(imageUrl);
+          console.log('✅ FAQ Image loaded from database:', imageUrl);
+        } else {
+          setFaqImage('https://images.pexels.com/photos/3183150/pexels-photo-3183150.jpeg?w=600&h=500&fit=crop');
+        }
       } else {
         setFaqImage('https://images.pexels.com/photos/3183150/pexels-photo-3183150.jpeg?w=600&h=500&fit=crop');
       }
@@ -1190,106 +1206,6 @@ const Home = () => {
 
       <HeroScrollDemo />
 
-      {/* Portfolio Section */}
-      <section className="portfolio-section" style={{ padding: 'clamp(40px, 10vw, 80px) 0', background: '#0A0A0A' }}>
-        <div className="container" style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 20px' }}>
-          <div className="section-header" style={{ textAlign: 'center', marginBottom: 'clamp(30px, 8vw, 50px)' }}>
-            <span className="section-subtitle" style={{ fontSize: 'clamp(12px, 3vw, 14px)', color: '#FFD700' }}>Our Work</span>
-            <h2 className="section-title" style={{ fontSize: 'clamp(28px, 6vw, 42px)', margin: '10px 0' }}>Featured <span style={{ color: '#FFD700' }}>Projects</span></h2>
-          </div>
-
-          <div className="portfolio-filters" style={{
-            display: 'flex',
-            justifyContent: 'center',
-            gap: 'clamp(8px, 3vw, 15px)',
-            marginBottom: 'clamp(30px, 8vw, 50px)',
-            flexWrap: 'wrap'
-          }}>
-            {['all', 'development', 'design', 'ai', 'marketing'].map(filter => (
-              <button 
-                key={filter}
-                onClick={() => setActiveFilter(filter)}
-                style={{
-                  padding: 'clamp(6px, 2vw, 10px) clamp(12px, 4vw, 24px)',
-                  fontSize: 'clamp(11px, 3vw, 14px)',
-                  background: activeFilter === filter ? '#FFD700' : 'transparent',
-                  border: `1px solid ${activeFilter === filter ? '#FFD700' : 'rgba(255,215,0,0.3)'}`,
-                  borderRadius: '30px',
-                  cursor: 'pointer',
-                  color: activeFilter === filter ? '#000' : '#FFD700'
-                }}
-              >
-                {filter === 'all' ? 'All' : filter.charAt(0).toUpperCase() + filter.slice(1)}
-              </button>
-            ))}
-          </div>
-
-          <div className="portfolio-grid" style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(clamp(250px, 80vw, 300px), 1fr))',
-            gap: 'clamp(20px, 5vw, 30px)'
-          }}>
-            {filteredPortfolio && filteredPortfolio.length > 0 ? (
-              filteredPortfolio.map((item: any) => (
-                <div key={item.id} className="portfolio-item" style={{
-                  transition: 'transform 0.3s ease'
-                }}>
-                  <div style={{
-                    position: 'relative',
-                    overflow: 'hidden',
-                    borderRadius: '15px',
-                    aspectRatio: '16/9'
-                  }}>
-                    <img 
-                      src={getImageUrl(item.image) || 'https://via.placeholder.com/400x225?text=No+Image'} 
-                      alt={item.title} 
-                      style={{
-                        width: '100%',
-                        height: '100%',
-                        objectFit: 'cover',
-                        transition: 'transform 0.3s ease'
-                      }}
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src = 'https://via.placeholder.com/400x225?text=No+Image';
-                      }}
-                    />
-                    <div style={{
-                      position: 'absolute',
-                      top: 0,
-                      left: 0,
-                      right: 0,
-                      bottom: 0,
-                      background: 'linear-gradient(135deg, rgba(0,0,0,0.8), rgba(0,0,0,0.6))',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      opacity: 0,
-                      transition: 'opacity 0.3s ease',
-                      padding: '20px'
-                    }}>
-                      <h4 style={{ fontSize: 'clamp(16px, 4vw, 20px)', marginBottom: '10px', color: '#FFD700' }}>{item.title}</h4>
-                      <p style={{ fontSize: 'clamp(11px, 3vw, 14px)', textAlign: 'center' }}>{item.client_name || item.client} • {item.project_year || item.year}</p>
-                      <button style={{
-                        marginTop: '15px',
-                        padding: '10px',
-                        background: '#FFD700',
-                        border: 'none',
-                        borderRadius: '50%',
-                        cursor: 'pointer'
-                      }}>
-                        <ExternalLink size={20} color="#000" />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <div style={{ textAlign: 'center', color: '#aaa', padding: '50px' }}>No portfolio items found</div>
-            )}
-          </div>
-        </div>
-      </section>
 
       {/* Features Section */}
       <section className="features-section" style={{ padding: 'clamp(40px, 10vw, 80px) 0' }}>
