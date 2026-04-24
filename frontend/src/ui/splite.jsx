@@ -1,4 +1,5 @@
-'use client'
+import React from "react";
+// 'use client'
 
 import { Suspense, lazy, useEffect, useState } from 'react'
 

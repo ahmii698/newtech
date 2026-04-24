@@ -24,5 +24,5 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
   },
-  "include": ["src", "src/components/ui/SplineDemo.jsx"]
+  "include": ["src", "src/components/ui/SplineDemo.jsx", "config.ts"]
 }

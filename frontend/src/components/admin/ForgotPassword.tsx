@@ -1,5 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { API_URL } from '../../../config';
+
 
 export default function ForgotPassword() {
   const [step, setStep] = useState<"email" | "otp" | "newPassword">("email");
@@ -47,7 +50,7 @@ export default function ForgotPassword() {
       console.log("📧 Sending email:", email);
 
       // ✅ LARAVEL API URL - PORT 8000
-      const response = await fetch('http://localhost:8000/api/forgot-password', {
+      const response = await fetch(`${API_URL}/forgot-password`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -99,7 +102,7 @@ export default function ForgotPassword() {
     
     try {
       // ✅ LARAVEL API URL - PORT 8000
-      const response = await fetch('http://localhost:8000/api/verify-otp', {
+      const response = await fetch(`${API_URL}/verify-otp`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -160,7 +163,7 @@ export default function ForgotPassword() {
 
     try {
       // ✅ LARAVEL API URL - PORT 8000
-      const response = await fetch('http://localhost:8000/api/reset-password', {
+      const response = await fetch(`${API_URL}/reset-password`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

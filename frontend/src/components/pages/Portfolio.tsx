@@ -1,61 +1,88 @@
-import React, { useState, useEffect, useRef } from 'react';
-import API from '../../services/api';
+// src/pages/Portfolio.tsx
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import { ExternalLink } from 'lucide-react';
 import './Portfolio.css';
+import { API_URL } from "../../../config";
+
+// const API_URL = 'http://127.0.0.1:8000/api';
 
 const Portfolio = () => {
   const [portfolio, setPortfolio] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeFilter, setActiveFilter] = useState('all');
-  const [technologies, setTechnologies] = useState([]);
 
   // Helper function to get image URL
-  const getImageUrl = (url) => {
+  const getImageUrl = (url: string | null) => {
     if (!url) return null;
     if (url.startsWith('http')) return url;
-    if (url.startsWith('/storage')) return `http://localhost:8000${url}`;
-    if (url.startsWith('storage')) return `http://localhost:8000/${url}`;
-    if (url.startsWith('uploads')) return `http://localhost:8000/${url}`;
-    return `http://localhost:8000/storage/uploads/${url}`;
+    if (url.startsWith('/storage')) return `${API_URL}${url}`;
+    if (url.startsWith('storage')) return `${API_URL}/${url}`;
+    if (url.startsWith('uploads')) return `${API_URL}/${url}`;
+    return `${API_URL}/storage/uploads/${url}`;
   };
 
   useEffect(() => {
     const fetchPortfolio = async () => {
       try {
-        const response = await API.get('/portfolio');
+        setLoading(true);
+        console.log('Fetching portfolio from:', `${API_URL}/portfolio`);
+        
+        const response = await axios.get(`${API_URL}/portfolio`);
         console.log('Portfolio API Response:', response.data);
         
+        // ✅ FIXED: Handle different response structures
         let portfolioData = [];
-        if (response.data.data && Array.isArray(response.data.data)) {
+        
+        // Check if response has data property
+        if (response.data?.data && Array.isArray(response.data.data)) {
           portfolioData = response.data.data;
-        } else if (Array.isArray(response.data)) {
+          console.log('Found data in response.data.data');
+        } 
+        // Check if response is directly an array
+        else if (Array.isArray(response.data)) {
           portfolioData = response.data;
+          console.log('Response is directly an array');
+        }
+        // Check if response has success and data
+        else if (response.data?.success && response.data?.data && Array.isArray(response.data.data)) {
+          portfolioData = response.data.data;
+          console.log('Found data in response.data.data (with success)');
         }
         
+        console.log('Portfolio Data Length:', portfolioData.length);
+        
         // Process portfolio data with image URLs
-        const processedData = portfolioData.map(item => ({
-          ...item,
+        const processedData = portfolioData.map((item: any) => ({
+          id: item.id,
+          title: item.title || 'Untitled',
+          description: item.description || '',
+          category: item.category || 'other',
+          project_url: item.project_url || '',
           image_url: getImageUrl(item.image),
-          technologies: item.technologies ? (typeof item.technologies === 'string' ? JSON.parse(item.technologies) : item.technologies) : []
+          technologies: (() => {
+            try {
+              if (typeof item.technologies === 'string') {
+                return JSON.parse(item.technologies);
+              }
+              return Array.isArray(item.technologies) ? item.technologies : [];
+            } catch (e) {
+              return [];
+            }
+          })()
         }));
         
+        console.log('Processed Projects:', processedData.length);
         setPortfolio(processedData);
         
-        // Extract unique technologies for filter
-        const allTechs = new Set();
-        processedData.forEach(item => {
-          if (item.technologies && Array.isArray(item.technologies)) {
-            item.technologies.forEach(tech => allTechs.add(tech));
-          }
-        });
-        setTechnologies(Array.from(allTechs));
-        
-      } catch (error) {
-        console.error('Error fetching portfolio:', error);
+      } catch (error: any) {
+        console.error('Error fetching portfolio:', error.message);
+        setPortfolio([]);
       } finally {
         setLoading(false);
       }
     };
+    
     fetchPortfolio();
   }, []);
 
@@ -130,34 +157,36 @@ const Portfolio = () => {
       {/* Filter Section */}
       <section className="portfolio-filters-section" style={{ padding: 'clamp(30px, 5vw, 40px) 20px' }}>
         <div className="container" style={{ maxWidth: '1200px', margin: '0 auto' }}>
-          <div className="filters" style={{
-            display: 'flex',
-            justifyContent: 'center',
-            gap: 'clamp(10px, 2vw, 15px)',
-            flexWrap: 'wrap',
-            marginBottom: 'clamp(30px, 5vw, 50px)'
-          }}>
-            {categories.map(filter => (
-              <button
-                key={filter}
-                onClick={() => setActiveFilter(filter)}
-                style={{
-                  padding: 'clamp(8px, 2vw, 10px) clamp(20px, 5vw, 28px)',
-                  fontSize: 'clamp(12px, 3vw, 14px)',
-                  background: activeFilter === filter ? '#FFD700' : 'transparent',
-                  border: `1px solid ${activeFilter === filter ? '#FFD700' : 'rgba(255,215,0,0.3)'}`,
-                  borderRadius: '40px',
-                  cursor: 'pointer',
-                  color: activeFilter === filter ? '#000' : '#FFD700',
-                  fontWeight: '500',
-                  transition: 'all 0.3s ease',
-                  textTransform: 'capitalize'
-                }}
-              >
-                {filter === 'all' ? 'All Projects' : filter}
-              </button>
-            ))}
-          </div>
+          {categories.length > 1 && (
+            <div className="filters" style={{
+              display: 'flex',
+              justifyContent: 'center',
+              gap: 'clamp(10px, 2vw, 15px)',
+              flexWrap: 'wrap',
+              marginBottom: 'clamp(30px, 5vw, 50px)'
+            }}>
+              {categories.map((filter: string) => (
+                <button
+                  key={filter}
+                  onClick={() => setActiveFilter(filter)}
+                  style={{
+                    padding: 'clamp(8px, 2vw, 10px) clamp(20px, 5vw, 28px)',
+                    fontSize: 'clamp(12px, 3vw, 14px)',
+                    background: activeFilter === filter ? '#FFD700' : 'transparent',
+                    border: `1px solid ${activeFilter === filter ? '#FFD700' : 'rgba(255,215,0,0.3)'}`,
+                    borderRadius: '40px',
+                    cursor: 'pointer',
+                    color: activeFilter === filter ? '#000' : '#FFD700',
+                    fontWeight: '500',
+                    transition: 'all 0.3s ease',
+                    textTransform: 'capitalize'
+                  }}
+                >
+                  {filter === 'all' ? 'All Projects' : filter}
+                </button>
+              ))}
+            </div>
+          )}
 
           {/* Projects Grid */}
           <div className="portfolio-grid" style={{
@@ -165,7 +194,7 @@ const Portfolio = () => {
             gridTemplateColumns: 'repeat(auto-fill, minmax(clamp(300px, 40vw, 380px), 1fr))',
             gap: 'clamp(25px, 4vw, 35px)'
           }}>
-            {filteredPortfolio.map((project) => (
+            {filteredPortfolio.map((project: any) => (
               <div
                 key={project.id}
                 className="portfolio-card"
@@ -188,7 +217,7 @@ const Portfolio = () => {
                   e.currentTarget.style.boxShadow = '0 10px 30px -15px rgba(0,0,0,0.3)';
                 }}
               >
-                {/* ✅ VERTICAL SCROLLABLE IMAGE CONTAINER - NO MODAL ON CLICK */}
+                {/* VERTICAL SCROLLABLE IMAGE CONTAINER */}
                 <div 
                   className="image-scroll-container"
                   style={{
@@ -202,23 +231,39 @@ const Portfolio = () => {
                     cursor: 'grab'
                   }}
                 >
-                  <img
-                    src={project.image_url || 'https://via.placeholder.com/400x600?text=No+Image'}
-                    alt={project.title}
-                    style={{
+                  {project.image_url ? (
+                    <img
+                      src={project.image_url}
+                      alt={project.title}
+                      style={{
+                        width: '100%',
+                        height: 'auto',
+                        minHeight: '100%',
+                        objectFit: 'cover',
+                        display: 'block'
+                      }}
+                      onError={(e) => {
+                        console.error('Image failed to load:', project.image_url);
+                        e.currentTarget.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="600" viewBox="0 0 400 600"%3E%3Crect width="400" height="600" fill="%231a1a1a"/%3E%3Ctext x="200" y="300" text-anchor="middle" fill="%23666" font-size="14"%3ENo Image%3C/text%3E%3C/svg%3E';
+                      }}
+                    />
+                  ) : (
+                    <div style={{
                       width: '100%',
-                      height: 'auto',
-                      minHeight: '100%',
-                      objectFit: 'cover',
-                      display: 'block'
-                    }}
-                    onError={(e) => {
-                      e.target.src = 'https://via.placeholder.com/400x600?text=No+Image';
-                    }}
-                  />
+                      height: '100%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      background: '#1a1a1a',
+                      color: '#666',
+                      fontSize: '14px'
+                    }}>
+                      No Image Available
+                    </div>
+                  )}
                 </div>
                 
-                {/* Card Content - NO CATEGORY BADGE, NO ICON */}
+                {/* Card Content */}
                 <div style={{ padding: 'clamp(18px, 4vw, 24px)' }}>
                   <h3 style={{ 
                     fontSize: 'clamp(18px, 4vw, 22px)', 
@@ -230,7 +275,7 @@ const Portfolio = () => {
                     {project.title}
                   </h3>
                   
-                  {/* Programming Languages / Technologies Section */}
+                  {/* Technologies Section */}
                   {project.technologies && project.technologies.length > 0 && (
                     <div style={{ marginBottom: '12px' }}>
                       <span style={{ 
@@ -240,10 +285,10 @@ const Portfolio = () => {
                         display: 'block',
                         marginBottom: '6px'
                       }}>
-                        Programming Languages:
+                        Technologies:
                       </span>
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                        {project.technologies.slice(0, 5).map((tech, techIdx) => (
+                        {project.technologies.slice(0, 5).map((tech: string, techIdx: number) => (
                           <span key={techIdx} style={{
                             fontSize: '11px',
                             color: '#FFD700',
@@ -316,7 +361,7 @@ const Portfolio = () => {
             ))}
           </div>
 
-          {filteredPortfolio.length === 0 && (
+          {filteredPortfolio.length === 0 && !loading && (
             <div style={{ textAlign: 'center', padding: '80px 20px', color: '#aaa' }}>
               <div style={{ fontSize: '64px', marginBottom: '20px', opacity: 0.5 }}>📁</div>
               <p style={{ fontSize: '18px' }}>No projects found in this category.</p>

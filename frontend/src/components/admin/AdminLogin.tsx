@@ -1,6 +1,8 @@
 // src/components/admin/AdminLogin.tsx
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { API_URL } from '../../../config';
 
 export default function AdminLogin() {
   const [email, setEmail] = useState("");
@@ -45,7 +47,7 @@ export default function AdminLogin() {
     setCharacterState("watching");
 
     try {
-      const response = await fetch('http://127.0.0.1:8000/api/admin-login', {
+      const response = await fetch(`${API_URL}/admin-login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

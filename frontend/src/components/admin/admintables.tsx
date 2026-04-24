@@ -1,5 +1,7 @@
 // src/components/admin/AdminTables.tsx (Updated)
 import { useEffect, useState } from "react";
+import axios from "axios";
+import { API_URL } from '../../../config';
 
 interface Props {
   table: string;
@@ -34,7 +36,7 @@ export default function AdminTables({ table }: Props) {
   const [sendingEmail, setSendingEmail] = useState<boolean>(false);
 
   // ✅ API URL
-  const API_URL = 'http://localhost:8000/api'; // Same as NewAdminPanel
+  const API_URL = `${API_URL}`; // Same as NewAdminPanel
   const getToken = () => localStorage.getItem('adminToken');
 
   const loadData = async (): Promise<void> => {

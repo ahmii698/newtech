@@ -1,5 +1,6 @@
 // PricingSection.tsx
 import React, { useState, useEffect } from 'react';
+import { API_URL } from '../../../config';
 
 interface Plan {
   id: number;
@@ -33,7 +34,7 @@ const PricingSection = () => {
 
   const fetchPlans = async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/pricing-plans');
+      const response = await fetch(`${API_URL}/pricing-plans`);
       const data = await response.json();
       setPlans(data.data || []);
     } catch (error) {
@@ -43,7 +44,7 @@ const PricingSection = () => {
 
   const fetchFeatures = async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/pricing-features');
+      const response = await fetch(`${API_URL}/pricing-features`);
       const data = await response.json();
       setFeatures(data.data || []);
     } catch (error) {
@@ -70,7 +71,7 @@ const PricingSection = () => {
     setStatus({ show: false, message: '', type: '' });
 
     try {
-      const response = await fetch('http://localhost:8000/api/plan-purchase', {
+      const response = await fetch(`${API_URL}/plan-purchase`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

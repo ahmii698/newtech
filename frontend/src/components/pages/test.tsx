@@ -2,8 +2,8 @@ import { useEffect, useState, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import API from '../../services/api';
 import { SplineSceneBasic } from "../../demo";
-import ProcessBalls from '../../components/common/ProcessBalls';
-import { HeroScrollDemo } from '../../components/demo/HeroScrollDemo';
+import ProcessBalls from '../common/ProcessBalls';
+import { HeroScrollDemo } from '../demo/HeroScrollDemo';
 
 import { 
   ChevronLeft, ChevronRight, Star, MapPin, Phone, 

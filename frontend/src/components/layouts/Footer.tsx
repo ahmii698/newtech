@@ -1,5 +1,5 @@
 import { Facebook, Twitter, Instagram, Linkedin, MapPin, Phone, Mail } from 'lucide-react';
-import { Link } from 'react-router-dom';  // 👈 YEH IMPORT MISSING THA
+import { Link } from 'react-router-dom';
 
 interface Props {
   darkMode: boolean;
@@ -18,11 +18,99 @@ const Footer = ({ darkMode }: Props) => {
               Collaboratively visualize strategic infomediaries after multimedia 
               based models.
             </p>
-            <div className="social-links">
-              <a href="#" aria-label="Facebook"><Facebook size={18} /></a>
-              <a href="#" aria-label="Twitter"><Twitter size={18} /></a>
-              <a href="#" aria-label="Instagram"><Instagram size={18} /></a>
-              <a href="#" aria-label="LinkedIn"><Linkedin size={18} /></a>
+            <div className="social-links" style={{ display: 'flex', gap: '15px', marginTop: '20px' }}>
+              <a href="#" aria-label="Facebook" style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'center',
+                width: '36px',
+                height: '36px',
+                borderRadius: '50%',
+                background: 'rgba(255,215,0,0.1)',
+                transition: 'all 0.3s ease',
+                color: '#FFD700'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = '#FFD700';
+                e.currentTarget.style.color = '#000';
+                e.currentTarget.style.transform = 'translateY(-3px)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'rgba(255,215,0,0.1)';
+                e.currentTarget.style.color = '#FFD700';
+                e.currentTarget.style.transform = 'translateY(0)';
+              }}>
+                <Facebook size={18} />
+              </a>
+              <a href="#" aria-label="Twitter" style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'center',
+                width: '36px',
+                height: '36px',
+                borderRadius: '50%',
+                background: 'rgba(255,215,0,0.1)',
+                transition: 'all 0.3s ease',
+                color: '#FFD700'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = '#FFD700';
+                e.currentTarget.style.color = '#000';
+                e.currentTarget.style.transform = 'translateY(-3px)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'rgba(255,215,0,0.1)';
+                e.currentTarget.style.color = '#FFD700';
+                e.currentTarget.style.transform = 'translateY(0)';
+              }}>
+                <Twitter size={18} />
+              </a>
+              <a href="#" aria-label="Instagram" style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'center',
+                width: '36px',
+                height: '36px',
+                borderRadius: '50%',
+                background: 'rgba(255,215,0,0.1)',
+                transition: 'all 0.3s ease',
+                color: '#FFD700'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = '#FFD700';
+                e.currentTarget.style.color = '#000';
+                e.currentTarget.style.transform = 'translateY(-3px)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'rgba(255,215,0,0.1)';
+                e.currentTarget.style.color = '#FFD700';
+                e.currentTarget.style.transform = 'translateY(0)';
+              }}>
+                <Instagram size={18} />
+              </a>
+              <a href="#" aria-label="LinkedIn" style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'center',
+                width: '36px',
+                height: '36px',
+                borderRadius: '50%',
+                background: 'rgba(255,215,0,0.1)',
+                transition: 'all 0.3s ease',
+                color: '#FFD700'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = '#FFD700';
+                e.currentTarget.style.color = '#000';
+                e.currentTarget.style.transform = 'translateY(-3px)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'rgba(255,215,0,0.1)';
+                e.currentTarget.style.color = '#FFD700';
+                e.currentTarget.style.transform = 'translateY(0)';
+              }}>
+                <Linkedin size={18} />
+              </a>
             </div>
           </div>
 

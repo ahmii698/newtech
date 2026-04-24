@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+
 import { 
   FiImage, FiBookOpen, FiHome, FiMail, FiMessageSquare, FiHelpCircle, 
   FiStar, FiImage as FiHeroImage, FiMail as FiNewsletter, FiFileText, 
@@ -9,6 +10,8 @@ import {
   FiRefreshCw, FiTrash2, FiEdit2, FiPlus, FiSearch, FiLogOut,
   FiSend, FiX, FiChevronLeft, FiChevronRight
 } from 'react-icons/fi';
+import axios from "axios";
+import { API_URL, STORAGE_URL } from '../../../config';
 
 // ==================== ALL DATABASE TABLES ====================
 const TABLES = [
@@ -574,8 +577,6 @@ const DataTable = ({ table, isMobile, isTablet }: { table: string; isMobile?: bo
   const [uploadingImage, setUploadingImage] = useState(false);
   const rowsPerPage = 10;
 
-  const API_URL = 'http://localhost:8000/api';
-
   // ✅ ICON PREVIEW FUNCTION (Emoji only)
   const getIconPreview = (iconName: string) => {
     if (!iconName) return '❓';
@@ -914,13 +915,13 @@ const DataTable = ({ table, isMobile, isTablet }: { table: string; isMobile?: bo
     return table === 'testimonials' && row.is_approved === 0;
   };
 
-  const getImageUrl = (url: string) => {
-    if (!url) return null;
-    if (url.startsWith('http')) return url;
-    if (url.startsWith('/storage')) return `http://localhost:8000${url}`;
-    if (url.startsWith('storage')) return `http://localhost:8000/${url}`;
-    return `http://localhost:8000/storage/uploads/${url}`;
-  };
+ const getImageUrl = (url: string) => {
+  if (!url) return null;
+  if (url.startsWith('http')) return url;
+  if (url.startsWith('/storage')) return `${STORAGE_URL}${url.replace('/storage', '')}`;
+  if (url.startsWith('storage')) return `${STORAGE_URL}/${url}`;
+  return `${STORAGE_URL}/uploads/${url}`;
+};
 
   const getVisibleColumns = () => {
     if (!data[0]) return [];
