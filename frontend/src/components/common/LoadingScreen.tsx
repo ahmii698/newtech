@@ -1,5 +1,27 @@
 // components/common/LoadingScreen.tsx
+import { useEffect } from 'react';
+
 const LoadingScreen = () => {
+  // Disable scroll when loading screen is active
+  useEffect(() => {
+    // Save original overflow style
+    const originalStyle = window.getComputedStyle(document.body).overflow;
+    
+    // Disable scroll
+    document.body.style.overflow = 'hidden';
+    document.body.style.height = '100vh';
+    document.documentElement.style.overflow = 'hidden';
+    document.documentElement.style.height = '100vh';
+    
+    // Re-enable scroll when component unmounts
+    return () => {
+      document.body.style.overflow = originalStyle;
+      document.body.style.height = '';
+      document.documentElement.style.overflow = '';
+      document.documentElement.style.height = '';
+    };
+  }, []);
+
   return (
     <div style={{ 
       background: '#0A0A0A', 
@@ -11,7 +33,8 @@ const LoadingScreen = () => {
       zIndex: 9999,
       display: 'flex',
       alignItems: 'center',
-      justifyContent: 'center'
+      justifyContent: 'center',
+      overflow: 'hidden' // Extra safety
     }}>
       <div style={{ textAlign: 'center' }}>
         <div style={{
@@ -74,6 +97,12 @@ const LoadingScreen = () => {
         @keyframes spin { 0% { transform: rotate(45deg); } 100% { transform: rotate(405deg); } }
         @keyframes bounce { 0%, 60%, 100% { transform: translateY(0); } 30% { transform: translateY(-15px); } }
         @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* Extra safety - no scroll bars */
+        body, html {
+          overflow: hidden !important;
+          height: 100% !important;
+        }
       `}</style>
     </div>
   );

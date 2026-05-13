@@ -2,9 +2,9 @@
 import { Linkedin, Twitter } from 'lucide-react';
 import { clamp } from '../../../utils/responsive';
 import { useState, useEffect } from 'react';
+import { API_URL } from '../../../../config';
 
 // Direct API URL
-const API_URL = 'http://127.0.0.1:8000';
 
 // Local SVG placeholder (no external URL)
 const LOCAL_PLACEHOLDER = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="300" height="250" viewBox="0 0 300 250"%3E%3Crect width="300" height="250" fill="%231a1a1a"/%3E%3Ccircle cx="150" cy="100" r="40" fill="%23333"/%3E%3Crect x="120" y="160" width="60" height="10" rx="5" fill="%23333"/%3E%3Ctext x="150" y="210" text-anchor="middle" fill="%23666" font-size="12"%3ENo Image%3C/text%3E%3C/svg%3E';

@@ -3,10 +3,7 @@ import { useState, useEffect } from 'react';
 import { ChevronRight } from 'lucide-react';
 import { clamp } from '../../../utils/responsive';
 import axios from 'axios';
-
-// Direct backend URL - API endpoint
-const BACKEND_URL = 'http://127.0.0.1:8000';
-const API_URL = 'http://127.0.0.1:8000/api';
+import { API_URL } from '../../../../config';
 
 const FaqSection = ({ faqs }: { faqs: any[] }) => {
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
@@ -17,15 +14,14 @@ const FaqSection = ({ faqs }: { faqs: any[] }) => {
   // Helper function to get image URL with cache busting
   const getImageUrl = (url: string | null): string => {
     if (!url) {
-    
       return 'https://images.pexels.com/photos/3183150/pexels-photo-3183150.jpeg?w=600&h=500&fit=crop';
     }
     if (url.startsWith('http')) return url;
     
     const cleanUrl = url.replace(/^\/+/, '');
-    let finalUrl = `${BACKEND_URL}/${cleanUrl}`;
+    // FIXED: Use API_URL instead of BACKEND_URL
+    let finalUrl = `${API_URL}/${cleanUrl}`;
     
-  
     return finalUrl;
   };
 
@@ -34,23 +30,16 @@ const FaqSection = ({ faqs }: { faqs: any[] }) => {
     try {
       setImageLoading(true);
       
-      
       const response = await axios.get(`${API_URL}/faq_images`);
-     
       
-      // ✅ FIXED: Response structure is { success: true, data: { ... } }
-      // data is an OBJECT, not an array
+      // Check if response has data
       if (response.data?.success && response.data?.data) {
         const imageObject = response.data.data;
-       
         
-        // Check if image object has image_url
         if (imageObject && imageObject.image_url) {
           const imageUrl = getImageUrl(imageObject.image_url);
           setFaqImage(imageUrl);
-         
         } else {
-         
           setFaqImage('https://images.pexels.com/photos/3183150/pexels-photo-3183150.jpeg?w=600&h=500&fit=crop');
         }
       } 
@@ -60,13 +49,11 @@ const FaqSection = ({ faqs }: { faqs: any[] }) => {
         if (firstImage && firstImage.image_url) {
           const imageUrl = getImageUrl(firstImage.image_url);
           setFaqImage(imageUrl);
-       
         } else {
           setFaqImage('https://images.pexels.com/photos/3183150/pexels-photo-3183150.jpeg?w=600&h=500&fit=crop');
         }
       }
       else {
-    
         setFaqImage('https://images.pexels.com/photos/3183150/pexels-photo-3183150.jpeg?w=600&h=500&fit=crop');
       }
     } catch (error) {

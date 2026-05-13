@@ -37,8 +37,8 @@ const Sidebar = ({ isOpen, onClose, darkMode }: Props) => {
             <img src="https://ui-avatars.com/api/?name=John+Doe&background=FFD700&color=0A0A0A" alt="User" />
           </div>
           <div className="profile-info">
-            <h4>Ahmed Malik</h4>
-            <p>ahmedmalik30600@gmail.com</p>
+            <h4>Fusix Tech</h4>
+            <p>fusixtech@gmail.com</p>
           </div>
         </div>
         

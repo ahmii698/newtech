@@ -12,14 +12,14 @@ const Footer = ({ darkMode }: Props) => {
         <div className="footer-grid">
           {/* About Section */}
           <div className="footer-section">
-            <h3 className="footer-title">Top<span>Tech</span></h3>
+            <h3 className="footer-title">Fusix<span>Tech</span></h3>
             <p className="footer-description">
               Monotonectally synergize granular markets and front markets. 
               Collaboratively visualize strategic infomediaries after multimedia 
               based models.
             </p>
             <div className="social-links" style={{ display: 'flex', gap: '15px', marginTop: '20px' }}>
-              <a href="#" aria-label="Facebook" style={{ 
+              <a href="https://www.facebook.com/FusixTech" target="_blank" rel="noopener noreferrer" aria-label="Facebook" style={{ 
                 display: 'flex', 
                 alignItems: 'center', 
                 justifyContent: 'center',
@@ -42,7 +42,7 @@ const Footer = ({ darkMode }: Props) => {
               }}>
                 <Facebook size={18} />
               </a>
-              <a href="#" aria-label="Twitter" style={{ 
+              <a href="https://x.com/FusixTech" target="_blank" rel="noopener noreferrer" aria-label="Twitter" style={{ 
                 display: 'flex', 
                 alignItems: 'center', 
                 justifyContent: 'center',
@@ -65,7 +65,7 @@ const Footer = ({ darkMode }: Props) => {
               }}>
                 <Twitter size={18} />
               </a>
-              <a href="#" aria-label="Instagram" style={{ 
+              <a href="https://www.instagram.com/fusixtech/" target="_blank" rel="noopener noreferrer" aria-label="Instagram" style={{ 
                 display: 'flex', 
                 alignItems: 'center', 
                 justifyContent: 'center',
@@ -88,7 +88,7 @@ const Footer = ({ darkMode }: Props) => {
               }}>
                 <Instagram size={18} />
               </a>
-              <a href="#" aria-label="LinkedIn" style={{ 
+              <a href="https://www.linkedin.com/company/fusix-tech/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" style={{ 
                 display: 'flex', 
                 alignItems: 'center', 
                 justifyContent: 'center',
@@ -144,15 +144,15 @@ const Footer = ({ darkMode }: Props) => {
             <ul className="contact-info">
               <li>
                 <MapPin size={18} />
-                <span>R870 block17</span>
+                <span>Rua fernao de magalhaes cerro alagoa apt L11 lote 20,Albuferira Portugal,8200-129</span>
               </li>
               <li>
                 <Phone size={18} />
-                <span>03322751363</span>
+                <span>+351 920 348 944</span>
               </li>
               <li>
                 <Mail size={18} />
-                <span>xahmedmalik30600@gmail.com</span>
+                <span>fusixtech@gmail.com</span>
               </li>
             </ul>
           </div>

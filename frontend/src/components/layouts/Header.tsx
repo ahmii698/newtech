@@ -1,7 +1,8 @@
-import { Menu, Search, Facebook, Twitter, Instagram, Linkedin, X } from 'lucide-react';
+import { Menu, Facebook, Twitter, Instagram, Linkedin } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import './Header.css';
+import logo from '../../assets/fusix.jpg';
 
 interface Props {
   darkMode: boolean;
@@ -10,7 +11,6 @@ interface Props {
 }
 
 const Header = ({ darkMode, setDarkMode, setSidebarOpen }: Props) => {
-  const [searchOpen, setSearchOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
@@ -46,8 +46,9 @@ const Header = ({ darkMode, setDarkMode, setSidebarOpen }: Props) => {
             <button className="menu-toggle" onClick={() => setSidebarOpen(prev => !prev)}>
               <Menu size={24} />
             </button>
-            <Link to="/" className="logo-link">
-              <h2 className="logo">Fusix<span>Tech</span></h2>
+            <Link to="/" className="logo-link" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <img src={logo} alt="FusixTech Logo" className="logo-image" style={{ height: '70px', width: 'auto', borderRadius: '12px' }} />
+              <h2 className="logo" style={{ margin: 0, fontSize: '1.8rem' }}>Fusix<span>Tech</span></h2>
             </Link>
           </div>
 
@@ -56,32 +57,18 @@ const Header = ({ darkMode, setDarkMode, setSidebarOpen }: Props) => {
             <Link to="/" className="nav-link">Home</Link>
             <Link to="/about" className="nav-link">About</Link>
             <Link to="/services" className="nav-link">Services</Link>
-             <Link to="/portfolio" className="nav-link">Portfolio</Link>
+            <Link to="/portfolio" className="nav-link">Portfolio</Link>
             <Link to="/contact" className="nav-link">Contact</Link>
             <Link to="/blog" className="nav-link">Blog</Link>
           </nav>
 
-          {/* Right Section */}
+          {/* Right Section - Only Social Icons */}
           <div className="header-right">
             <div className="social-icons">
-              <a href="#" className="social-icon"><Facebook size={18} /></a>
-              <a href="#" className="social-icon"><Twitter size={18} /></a>
-              <a href="#" className="social-icon"><Instagram size={18} /></a>
-              <a href="#" className="social-icon"><Linkedin size={18} /></a>
-            </div>
-
-            <div className="search-container">
-             
-              
-              {searchOpen && (
-                <div className="search-bar">
-                  <input type="text" placeholder="Search..." className="search-input" autoFocus />
-                  <button className="search-submit">Search</button>
-                  <button className="search-close" onClick={() => setSearchOpen(false)}>
-                    <X size={16} />
-                  </button>
-                </div>
-              )}
+              <a href="https://www.facebook.com/FusixTech" target="_blank" rel="noopener noreferrer" className="social-icon"><Facebook size={18} /></a>
+              <a href="https://x.com/FusixTech" target="_blank" rel="noopener noreferrer" className="social-icon"><Twitter size={18} /></a>
+              <a href="https://www.instagram.com/fusixtech/" target="_blank" rel="noopener noreferrer" className="social-icon"><Instagram size={18} /></a>
+              <a href="https://www.linkedin.com/company/fusix-tech/" target="_blank" rel="noopener noreferrer" className="social-icon"><Linkedin size={18} /></a>
             </div>
           </div>
         </div>
@@ -96,23 +83,10 @@ const Header = ({ darkMode, setDarkMode, setSidebarOpen }: Props) => {
               <button className="menu-toggle" onClick={() => setSidebarOpen(prev => !prev)}>
                 <Menu size={24} />
               </button>
-              <Link to="/" className="logo-link">
-                <h2 className="logo">Fusix<span>Tech</span></h2>
+              <Link to="/" className="logo-link" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <img src={logo} alt="FusixTech Logo" className="logo-image" style={{ height: '50px', width: 'auto', borderRadius: '10px' }} />
+                <h2 className="logo" style={{ margin: 0, fontSize: '1.3rem' }}>Fusix<span>Tech</span></h2>
               </Link>
-            </div>
-
-            <div className="search-container">
-           
-              
-              {searchOpen && (
-                <div className="search-bar mobile-search-bar">
-                  <input type="text" placeholder="Search..." className="search-input" autoFocus />
-                  <button className="search-submit">Search</button>
-                  <button className="search-close" onClick={() => setSearchOpen(false)}>
-                    <X size={12} />
-                  </button>
-                </div>
-              )}
             </div>
           </div>
 
@@ -121,6 +95,7 @@ const Header = ({ darkMode, setDarkMode, setSidebarOpen }: Props) => {
             <Link to="/" className="nav-link">Home</Link>
             <Link to="/about" className="nav-link">About</Link>
             <Link to="/services" className="nav-link">Services</Link>
+            <Link to="/portfolio" className="nav-link">Portfolio</Link>
             <Link to="/contact" className="nav-link">Contact</Link>
             <Link to="/blog" className="nav-link">Blog</Link>
           </nav>

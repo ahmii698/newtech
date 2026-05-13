@@ -1,4 +1,3 @@
-// src/components/pages/sections/ContactSection.tsx
 import { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
 import { API_URL } from '../../../../config';
@@ -12,14 +11,9 @@ const ContactSection = ({ companyInfo, onBookAppointment }: { companyInfo: any, 
   const [formStatus, setFormStatus] = useState('');
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
   const isMobile = window.innerWidth < 768;
-  const nameInputRef = useRef<HTMLInputElement>(null);
 
-  // Auto-focus on name input
-  useEffect(() => {
-    setTimeout(() => {
-      nameInputRef.current?.focus();
-    }, 100);
-  }, []);
+  // ❌ REMOVED AUTO-FOCUS - This was causing page to scroll down
+  // No more nameInputRef and auto-focus effect
 
   // Auto-dismiss toast after 3 seconds
   useEffect(() => {
@@ -203,7 +197,6 @@ const ContactSection = ({ companyInfo, onBookAppointment }: { companyInfo: any, 
                     Full Name <span style={{ color: '#FFD700' }}>*</span>
                   </label>
                   <input
-                    ref={nameInputRef}
                     type="text"
                     placeholder="Enter your full name"
                     value={formData.name}

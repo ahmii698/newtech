@@ -3421,3 +3421,82 @@
     transform: translateY(-8px);
   }
 }
+/* Force body to start at top */
+html, body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+}
+
+/* Ensure page starts at top */
+#root, .home-container {
+  min-height: 100vh;
+  background: #0A0A0A;
+}
+
+/* Hero top anchor - ensures scroll starts at top */
+.hero-top-anchor {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1px;
+  height: 1px;
+  pointer-events: none;
+}
+
+/* Override any forced scroll behavior */
+* {
+  scroll-margin-top: 0 !important;
+}
+
+/* Remove any margin that might push content down */
+.home-container {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}
+
+/* Fade-in animations */
+.hidden-element {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), 
+              transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.visible-element {
+  opacity: 1 !important;
+  transform: translateY(0) !important;
+}
+
+/* Section styles */
+.services-section,
+.features-section,
+.stats-section,
+.process-section,
+.testimonials-section,
+.contact-section,
+.faq-section {
+  position: relative;
+  z-index: 1;
+}
+
+/* Hero section on top */
+.hero-section {
+  position: relative;
+  z-index: 2;
+}
+
+/* Floating button hover */
+.floating-appointment-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 12px 30px rgba(255, 215, 0, 0.4);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .hidden-element {
+    transform: translateY(20px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+}
