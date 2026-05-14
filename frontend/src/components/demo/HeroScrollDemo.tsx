@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { ContainerScroll } from "../ui/container-scroll-animation";
 import axios from 'axios';
-import { API_URL } from "../../../config"; 
+import { API_URL, STORAGE_URL } from "../../../config"; // ✅ STORAGE_URL import karo
 
 interface Project {
   id: number;
@@ -19,7 +19,6 @@ interface LinePosition {
 
 // Placeholder image - fast loading
 const PLACEHOLDER_IMAGE = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="600" height="340" viewBox="0 0 600 340"%3E%3Crect width="600" height="340" fill="%231a1a1a"/%3E%3Ctext x="300" y="170" text-anchor="middle" fill="%23666" font-size="14"%3ELoading...%3C/text%3E%3C/svg%3E';
-// const API_URL = 'http://127.0.0.1:8000/api';
 
 export function HeroScrollDemo() {
   const [selectedProject, setSelectedProject] = useState<number>(0);
@@ -44,18 +43,49 @@ export function HeroScrollDemo() {
     return () => window.removeEventListener('resize', checkScreenSize);
   }, []);
 
-  // Helper function to get image URL with cache busting
+  // ✅ FIXED: Helper function to get image URL - STORAGE_URL use karo
   const getImageUrl = useCallback((url: string | null): string => {
-    if (!url) return PLACEHOLDER_IMAGE;
-    if (url.startsWith('http')) return url;
-    if (url.startsWith('/storage')) return `${API_URL}/${url}`;
-    if (url.startsWith('storage')) return `${API_URL}/${url}`;
-    if (url.startsWith('uploads')) return `${API_URL}/${url}`;
-    return PLACEHOLDER_IMAGE;
+    if (!url) {
+      console.log('⚠️ No image URL');
+      return PLACEHOLDER_IMAGE;
+    }
+    
+    // Agar already full URL hai (http/https se start)
+    if (url.startsWith('http')) {
+      return url;
+    }
+    
+    // Clean the path
+    let cleanUrl = url;
+    
+    // Agar /storage/ se start ho raha hai toh hatake STORAGE_URL ke saath jodo
+    if (cleanUrl.startsWith('/storage/')) {
+      cleanUrl = cleanUrl.replace('/storage/', '');
+    }
+    // Agar storage/ se start ho raha hai (baghair slash)
+    else if (cleanUrl.startsWith('storage/')) {
+      cleanUrl = cleanUrl.replace('storage/', '');
+    }
+    // Agar uploads/ se start ho raha hai
+    else if (cleanUrl.startsWith('uploads/')) {
+      cleanUrl = cleanUrl;
+    }
+    
+    // Remove any leading slashes
+    cleanUrl = cleanUrl.replace(/^\/+/, '');
+    
+    // ✅ STORAGE_URL use karo, API_URL nahi
+    const finalUrl = `${STORAGE_URL}/${cleanUrl}`;
+    
+    console.log('🖼️ Original URL:', url);
+    console.log('🖼️ Final URL:', finalUrl);
+    
+    return finalUrl;
   }, []);
 
   // Handle image error
   const handleImageError = useCallback((projectId: number, imageIndex: number) => {
+    console.error(`❌ Image error for project ${projectId}, image ${imageIndex}`);
     setImageErrors(prev => ({
       ...prev,
       [`${projectId}-${imageIndex}`]: true
@@ -70,17 +100,16 @@ export function HeroScrollDemo() {
     return project.images?.[imageIndex] || PLACEHOLDER_IMAGE;
   }, [imageErrors]);
 
-  // Fetch portfolio projects - FIXED: Removed AbortController
+  // Fetch portfolio projects
   useEffect(() => {
     const fetchProjects = async () => {
       try {
         setLoading(true);
-        console.log('Fetching projects from:', `${API_URL}/portfolio_projects`);
+        console.log('📡 Fetching projects from:', `${API_URL}/portfolio_projects`);
         
-        // ✅ REMOVED AbortController - no more cancellation
         const response = await axios.get(`${API_URL}/portfolio_projects`);
         
-        console.log('Projects Response:', response.data);
+        console.log('📦 Projects Response:', response.data);
         
         // Check response structure
         let projectsData = [];
@@ -116,11 +145,11 @@ export function HeroScrollDemo() {
           setProjects(formattedProjects);
           console.log('✅ Projects loaded:', formattedProjects.length);
         } else {
-          console.log('No projects found in response');
+          console.log('⚠️ No projects found in response');
           setProjects([]);
         }
       } catch (error: any) {
-        console.error('Error fetching projects:', error.message);
+        console.error('❌ Error fetching projects:', error.message);
         setProjects([]);
       } finally {
         setLoading(false);

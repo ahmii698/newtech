@@ -16,13 +16,16 @@ class FaqImageController extends Controller
         if (!$image) {
             return response()->json([
                 'success' => true,
-                'data' => [
-                    'id' => 1,
-                    'image_url' => 'https://images.pexels.com/photos/3183150/pexels-photo-3183150.jpeg?w=600&h=500&fit=crop',
-                    'alt_text' => 'FAQ Illustration',
-                    'is_active' => 1
-                ]
+                'data' => null // Jab koi image na ho toh null bhejo
             ]);
+        }
+        
+        // Ensure image_url me /storage/ prefix sahi se ho
+        if ($image->image_url && !str_starts_with($image->image_url, 'http')) {
+            // Agar /storage/ se start nahi ho raha toh add karo
+            if (!str_starts_with($image->image_url, '/storage/')) {
+                $image->image_url = '/storage/' . ltrim($image->image_url, '/');
+            }
         }
         
         return response()->json([

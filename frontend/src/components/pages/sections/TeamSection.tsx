@@ -2,9 +2,7 @@
 import { Linkedin, Twitter } from 'lucide-react';
 import { clamp } from '../../../utils/responsive';
 import { useState, useEffect } from 'react';
-import { API_URL } from '../../../../config';
-
-// Direct API URL
+import { API_URL, STORAGE_URL } from '../../../../config'; // ✅ STORAGE_URL import karo
 
 // Local SVG placeholder (no external URL)
 const LOCAL_PLACEHOLDER = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="300" height="250" viewBox="0 0 300 250"%3E%3Crect width="300" height="250" fill="%231a1a1a"/%3E%3Ccircle cx="150" cy="100" r="40" fill="%23333"/%3E%3Crect x="120" y="160" width="60" height="10" rx="5" fill="%23333"/%3E%3Ctext x="150" y="210" text-anchor="middle" fill="%23666" font-size="12"%3ENo Image%3C/text%3E%3C/svg%3E';
@@ -21,12 +19,31 @@ const TeamCard = ({ member, isMobile }: { member: any; isMobile: boolean }) => {
     return () => clearInterval(interval);
   }, []);
 
+  // ✅ FIXED: getImageUrl function - ab STORAGE_URL use karega
   const getImageUrl = (url: string | null): string => {
     if (!url) return LOCAL_PLACEHOLDER;
+    
+    // Agar already full URL hai
     if (url.startsWith('http')) return url;
-    const cleanUrl = url.replace(/^\/+/, '');
-    let finalUrl = `${API_URL}/${cleanUrl}`;
-    return `${finalUrl}?t=${imageTimestamp}`;
+    
+    // Clean the path
+    let cleanUrl = url;
+    
+    // Agar /storage/ se start ho raha hai toh hatake STORAGE_URL ke saath jodo
+    if (cleanUrl.startsWith('/storage/')) {
+      cleanUrl = cleanUrl.replace('/storage/', '');
+    }
+    
+    // Remove any leading slashes
+    cleanUrl = cleanUrl.replace(/^\/+/, '');
+    
+    // ✅ STORAGE_URL use karo, API_URL nahi
+    const finalUrl = `${STORAGE_URL}/${cleanUrl}?t=${imageTimestamp}`;
+    
+    console.log('🖼️ Team Image Original:', url); // Debug log
+    console.log('🖼️ Team Image Final:', finalUrl); // Debug log
+    
+    return finalUrl;
   };
 
   const handleCardClick = () => {
@@ -94,6 +111,7 @@ const TeamCard = ({ member, isMobile }: { member: any; isMobile: boolean }) => {
                 display: 'block'
               }} 
               onError={(e) => {
+                console.error('❌ Team image load failed:', member.image);
                 (e.target as HTMLImageElement).src = LOCAL_PLACEHOLDER;
               }}
             />
@@ -199,7 +217,7 @@ const TeamCard = ({ member, isMobile }: { member: any; isMobile: boolean }) => {
                   e.currentTarget.style.background = 'rgba(255,215,0,0.1)';
                   e.currentTarget.style.transform = 'scale(1)';
                 }}>
-                <Linkedin size={clamp(14, 15, 16)} color={clamp(14, 15, 16) > 14 ? "#FFD700" : "#000"} />
+                <Linkedin size={clamp(14, 15, 16)} color="#fff" />
               </a>
             )}
             {member.social_twitter && member.social_twitter !== '#' && (
@@ -227,7 +245,7 @@ const TeamCard = ({ member, isMobile }: { member: any; isMobile: boolean }) => {
                   e.currentTarget.style.background = 'rgba(255,215,0,0.1)';
                   e.currentTarget.style.transform = 'scale(1)';
                 }}>
-                <Twitter size={clamp(14, 15, 16)} color={clamp(14, 15, 16) > 14 ? "#FFD700" : "#000"} />
+                <Twitter size={clamp(14, 15, 16)} color="#fff" />
               </a>
             )}
           </div>

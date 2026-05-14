@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { ChevronRight } from 'lucide-react';
 import { clamp } from '../../../utils/responsive';
 import axios from 'axios';
-import { API_URL } from '../../../../config';
+import { API_URL, STORAGE_URL } from '../../../../config';
 
 const FaqSection = ({ faqs }: { faqs: any[] }) => {
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
@@ -11,54 +11,78 @@ const FaqSection = ({ faqs }: { faqs: any[] }) => {
   const [imageLoading, setImageLoading] = useState<boolean>(true);
   const isMobile = window.innerWidth < 768;
 
-  // Helper function to get image URL with cache busting
-  const getImageUrl = (url: string | null): string => {
-    if (!url) {
-      return 'https://images.pexels.com/photos/3183150/pexels-photo-3183150.jpeg?w=600&h=500&fit=crop';
-    }
-    if (url.startsWith('http')) return url;
+  // Helper function to get image URL
+  const getImageUrl = (imagePath: string | null): string => {
+    if (!imagePath) return '';
     
-    const cleanUrl = url.replace(/^\/+/, '');
-    // FIXED: Use API_URL instead of BACKEND_URL
-    let finalUrl = `${API_URL}/${cleanUrl}`;
+    // Agar pexels ya koi external URL hai toh return empty (fallback nahi chahiye)
+    if (imagePath.includes('pexels.com') || imagePath.includes('unsplash.com')) {
+      return '';
+    }
+    
+    // Agar already full URL hai
+    if (imagePath.startsWith('http')) {
+      return imagePath;
+    }
+    
+    // Clean path - remove leading slashes
+    let cleanPath = imagePath;
+    
+    // Agar /storage/ se start ho raha hai
+    if (cleanPath.startsWith('/storage/')) {
+      cleanPath = cleanPath.replace('/storage/', '');
+    }
+    
+    // Remove any remaining leading slashes
+    cleanPath = cleanPath.replace(/^\/+/, '');
+    
+    // STORAGE_URL use karo
+    const finalUrl = `${STORAGE_URL}/${cleanPath}`;
+    console.log('🔍 Image Path:', imagePath);
+    console.log('🔍 Final URL:', finalUrl);
     
     return finalUrl;
   };
 
-  // Fetch FAQ Image directly from database
+  // Fetch FAQ Image from API
   const fetchFaqImage = async () => {
     try {
       setImageLoading(true);
       
+      console.log('📡 Fetching from:', `${API_URL}/faq_images`);
+      
       const response = await axios.get(`${API_URL}/faq_images`);
       
-      // Check if response has data
-      if (response.data?.success && response.data?.data) {
-        const imageObject = response.data.data;
+      console.log('📦 API Response:', response.data);
+      
+      if (response.data?.success) {
+        const imageData = response.data.data;
         
-        if (imageObject && imageObject.image_url) {
-          const imageUrl = getImageUrl(imageObject.image_url);
-          setFaqImage(imageUrl);
-        } else {
-          setFaqImage('https://images.pexels.com/photos/3183150/pexels-photo-3183150.jpeg?w=600&h=500&fit=crop');
+        // Agar data null hai ya image_url nahi hai
+        if (!imageData || !imageData.image_url) {
+          console.log('⚠️ No image data found');
+          setFaqImage('');
+          return;
         }
-      } 
-      // Fallback: if data is array
-      else if (response.data?.data && Array.isArray(response.data.data) && response.data.data.length > 0) {
-        const firstImage = response.data.data[0];
-        if (firstImage && firstImage.image_url) {
-          const imageUrl = getImageUrl(firstImage.image_url);
-          setFaqImage(imageUrl);
-        } else {
-          setFaqImage('https://images.pexels.com/photos/3183150/pexels-photo-3183150.jpeg?w=600&h=500&fit=crop');
+        
+        // Agar Pexels fallback URL aaya hai backend se
+        if (imageData.image_url.includes('pexels.com')) {
+          console.log('⚠️ Backend sent Pexels fallback, ignoring');
+          setFaqImage('');
+          return;
         }
-      }
-      else {
-        setFaqImage('https://images.pexels.com/photos/3183150/pexels-photo-3183150.jpeg?w=600&h=500&fit=crop');
+        
+        const imageUrl = getImageUrl(imageData.image_url);
+        console.log('✅ Setting image URL:', imageUrl);
+        setFaqImage(imageUrl);
+        
+      } else {
+        console.log('⚠️ API call failed');
+        setFaqImage('');
       }
     } catch (error) {
-      console.error('🔥 Error fetching FAQ image:', error);
-      setFaqImage('https://images.pexels.com/photos/3183150/pexels-photo-3183150.jpeg?w=600&h=500&fit=crop');
+      console.error('❌ Error fetching FAQ image:', error);
+      setFaqImage('');
     } finally {
       setImageLoading(false);
     }
@@ -105,58 +129,64 @@ const FaqSection = ({ faqs }: { faqs: any[] }) => {
           alignItems: 'center'
         }}>
           
-          {/* FAQ Image */}
-          <div style={{
-            borderRadius: '20px',
-            overflow: 'hidden',
-            boxShadow: '0 20px 40px rgba(0, 0, 0, 0.3)',
-            border: '1px solid rgba(255, 215, 0, 0.15)',
-            background: '#1a1a1a',
-            minHeight: isMobile ? '250px' : '400px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center'
-          }}>
-            {imageLoading ? (
-              <div style={{
-                width: '100%',
-                height: isMobile ? '250px' : '400px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                background: '#1a1a1a'
-              }}>
-                <div style={{
-                  width: '40px',
-                  height: '40px',
-                  border: '3px solid #333',
-                  borderTop: '3px solid #FFD700',
-                  borderRadius: '50%',
-                  animation: 'spin 1s linear infinite'
-                }} />
-              </div>
-            ) : (
+          {/* FAQ Image - Only show if real image exists */}
+          {faqImage && !imageLoading && (
+            <div style={{
+              borderRadius: '20px',
+              overflow: 'hidden',
+              boxShadow: '0 20px 40px rgba(0, 0, 0, 0.3)',
+              border: '1px solid rgba(255, 215, 0, 0.15)',
+              background: '#1a1a1a',
+              minHeight: isMobile ? '250px' : '400px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
               <img 
                 src={faqImage}
                 alt="FAQ Illustration"
                 style={{
                   width: '100%',
-                  height: 'auto',
+                  height: '100%',
                   maxHeight: isMobile ? '250px' : '400px',
                   minHeight: isMobile ? '250px' : '400px',
                   objectFit: 'cover',
                   display: 'block'
                 }}
                 onError={(e) => {
-                  console.error('🖼️ IMAGE LOAD FAILED. URL was:', faqImage);
-                  (e.target as HTMLImageElement).src = 'https://images.pexels.com/photos/3183150/pexels-photo-3183150.jpeg?w=600&h=500&fit=crop';
+                  console.error('❌ Image failed to load:', faqImage);
+                  setFaqImage('');
                 }}
               />
-            )}
-          </div>
+            </div>
+          )}
+          
+          {/* Loading state */}
+          {imageLoading && (
+            <div style={{
+              borderRadius: '20px',
+              overflow: 'hidden',
+              boxShadow: '0 20px 40px rgba(0, 0, 0, 0.3)',
+              border: '1px solid rgba(255, 215, 0, 0.15)',
+              background: '#1a1a1a',
+              minHeight: isMobile ? '250px' : '400px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <div style={{
+                width: '40px',
+                height: '40px',
+                border: '3px solid #333',
+                borderTop: '3px solid #FFD700',
+                borderRadius: '50%',
+                animation: 'spin 1s linear infinite'
+              }} />
+            </div>
+          )}
           
           {/* FAQ Questions */}
-          <div>
+          <div style={!faqImage ? { gridColumn: isMobile ? '1' : '1 / -1' } : {}}>
             {faqs.slice(0, 5).map((faq: any) => (
               <div key={faq.id} className="faq-item" style={{
                 marginBottom: '12px',

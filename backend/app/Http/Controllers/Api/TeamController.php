@@ -20,7 +20,7 @@ class TeamController extends Controller
             'data' => $team
         ]);
     }
-    
+      
     // GET /api/team/{id} - Ek specific team member
     public function show($id)
     {
